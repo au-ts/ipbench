@@ -1,6 +1,0 @@
-* Multiple debugging levels 
-* fix tbench for new layouts
-* fix so ipbenchd doesn't need --target for target mode by 
-  checking a field in the test it loads as to if it should be 
-  in target or client mode
-* fix up the size_t/int discrepency that has crept in
