@@ -1,4 +1,4 @@
-/* 
+/*
  * ipbench
  * A benchmark for testing IP implementations
  * See COPYING for license terms
@@ -6,21 +6,21 @@
  */
 
 /*
- * General include file 
+ * General include file
  */
 
 #ifndef _IPBENCH_H
 #define _IPBENCH_H
 
 #include "config.h"
+#ifdef HAVE_GETOPT_H
+    #include <getopt.h>
+#else
+    #include "getopt.h"
+#endif
 
 #include <ctype.h>
 #include <errno.h>
-#ifdef HAVE_GETOPT_H
- #include <getopt.h>
-#else
- #include "getopt.h"
-#endif
 #include <signal.h>
 #include <stdarg.h>
 #include <stdio.h>

@@ -57,20 +57,27 @@ struct ipbench_plugin {
 #endif
 	/* any arguments the controller may need to parse */
 	int (*setup_controller)(char *arg);
+
 	/* start the test.  Timestamp *start with gettimeofday */
 	int (*start)(struct timeval *start);
+
 	/* stop the test.  Once again, timestamp *stop */
 	int (*stop)(struct timeval *stop);
+
 	/* point data to a block of size for sending back to controller.
            running_time will be passed to the test as the difference between
            start and stop above */
 	int (*marshall)(char **data, int *size, double running_time);
+
 	/* clean up after marshalling (get the block of data you passed to marshall as an argument) */
 	void (*marshall_cleanup)(char **data);
+
 	/* called from controller to decode results */
 	int (*unmarshall)(char *input, int input_len, char **data, int *data_len);
+	
 	/* clean up after unmarshalling */
 	void (*unmarshall_cleanup)(char **data);
+	
 	/* called to aggregate and output results */
 #ifdef IPBENCH_TEST_CLIENT       
 	int (*output)(struct client_data data[], int nelem);
