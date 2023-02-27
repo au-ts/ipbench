@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import ipbench_client, ipbench_target
 import sys
 import re
 import socket
@@ -8,147 +7,205 @@ import select
 from copy import copy
 from optparse import OptionParser
 from lxml.etree import parse
+import ipbench_client
+import ipbench_target
 
-options = None
-thetest = None
+OPTIONS = None
+SELECTED_TEST = None
+
 
 def dbprint(msg):
-    global options
-    if options.debug:
+    """
+    Debug print.
+
+    Args:
+        msg: message to print
+    """
+    global OPTIONS
+    if OPTIONS.debug:
         sys.stderr.write(msg + "\n")
-#        print >> sys.stderr, msg
+
 
 class IpBenchError(Exception):
+    """
+    Simple class for error representation.
+
+    Attributes:
+        value: Error value
+    """
+
     def __init__(self, value):
         self.value = value
+
     def __str__(self):
         return repr(self.value)
 
-class IpbenchTestClient :
-    """A client class"""
-    def __init__(self, hostname, port, test_target, test_port, test_args, id, test_name, test_ptr):
+
+class IpbenchTestClient:
+    """
+    Class encapsulating logic for controller machine to spin up tests.
+    """
+
+    def __init__(self, hostname, port, test_target, test_port, id, test_name, test_ptr, test_args=None):
         self.hostname = hostname
         self.port = port
         self.test_port = test_port
         self.test_target = test_target
         self.test_args = test_args
-        self.s = None
-        self.id = id
+        self.socket = None
+        self.id = id    # Identifier for this client
         self.test_name = test_name
         self.test_ptr = test_ptr
-        if (self.test_args == None):
-            self.test_args = ""
 
         dbprint("[IpbenchTestClient:__init__] : client " + self.hostname +
                 " port " + repr(self.port) + " test_port " + repr(self.test_port) + " test_args " + self.test_args)
 
-    #for select()
+    # for select()
     def fileno(self):
-        return self.s.fileno()
+        """
+        Return file number of opened socket to client.
+        """
+        return self.socket.fileno()
 
-    #parse a return code that looks like
-    # 123 CODE(MESSAGE)
     def _parse_return_code(self, data):
+        """
+        Parse a return code. Used for telnet interface to clients.
+        Return codes are of the form 123 CODE(MESSAGE)
+
+        Params:
+            data: Return code from telnet
+        """
         status = {}
         status["code"] = int(data[0:3])
-        f = data.find("(")
-        if ( f == -1):
+        fence_start = data.find("(")
+        if (fence_start == -1):
             status["str"] = data[4:].strip()
             status["msg"] = ""
-        else :
-            f2 = data.find(")")
-            status["str"] = data[4:f].strip()
-            status["msg"] = data[f+1:f2].strip()
+        else:
+            fence_end = data.find(")")
+            status["str"] = data[4:fence_start].strip()
+            status["msg"] = data[fence_start+1:fence_end].strip()
 
-        dbprint( "[parse_return_code] : "
-                 + " code=" +repr(status["code"])
-                 + "|str=" + status["str"]
-                 + "|msg=" + status["msg"]+"|")
+        dbprint("[parse_return_code] : "
+                + " code=" + repr(status["code"])
+                + "|str=" + status["str"]
+                + "|msg=" + status["msg"]+"|")
         return status
 
     def parse_return_code(self):
-        data = self.s.recv(1024).decode('utf-8')
+        """
+        Get and parse a return code from telnet.
+        """
+        data = self.socket.recv(1024).decode('utf-8')
         return self._parse_return_code(data)
-    
+
     def send_command(self, cmd):
+        """
+        Send a command to the client over telnet.
+
+        Params:
+            cmd: Command to send
+        """
         dbprint("[send_command] : " + cmd)
-        self.s.send((cmd + "\n").encode('utf-8'))
+        self.socket.send((cmd + "\n").encode('utf-8'))
 
     def connect(self):
-        global options
+        """
+        Connect to the client machine. Creates a socket and tests that
+        communication works as expected.
 
-        dbprint("[connect] start | hostname " + self.hostname + " | port " + repr(self.port) + " | ");
+        Raises an IpBenchError exception on failure.
+        """
+        global OPTIONS
+
+        dbprint("[connect] start | hostname " + self.hostname +
+                " | port " + repr(self.port) + " | ")
 
         try:
-            self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             try:
-                self.s.connect((self.hostname, self.port))
-            except:
-                sys.stderr.write("Can't connect to " + self.hostname +
-                                 " on port " + repr(self.port) +
-                                 " ... invalid host or port?\n")
+                self.socket.connect((self.hostname, self.port))
+            except OSError:
+                sys.stderr.write(f"Can't connect to {self.hostname} on port {repr(self.port)}"
+                                 + " ... invalid host or port?\n")
                 sys.exit(1)
             status = self.parse_return_code()
 
             if (status["code"] != 100):
-                raise IpBencherror("Invalid Version Flag")
+                raise IpBenchError("Invalid Version Flag")
 
-            if (options.reset):
+            if (OPTIONS.reset):
                 self.send_command("ABORT")
-                #the connection should have closed; re-open
-                self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                self.s.connect((self.hostname, self.port))
+                # the connection should have closed; re-open
+                self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self.socket.connect((self.hostname, self.port))
                 status = self.parse_return_code()
                 if (status["code"] != 100):
                     raise IpBenchError("Invalid Version Flag")
-            #continue
-            #TODO: check versions
+            # continue
+            # TODO: check versions
             self.send_command("HELLO")
             status = self.parse_return_code()
             if (status["code"] != 200):
-                raise IpBenchError("HELLO to " + self.hostname + " failed (" + str(status["code"]) + " " + status["str"] + ")")
+                raise IpBenchError("HELLO to " + self.hostname + " failed (" +
+                                   str(status["code"]) + " " + status["str"] + ")")
             self.send_command("LOAD " + self.test_name)
             status = self.parse_return_code()
             if (status["code"] == 421):
-                raise IpBenchError("LOAD to " + self.hostname + " failed ("+ status["msg"] + ")")
+                raise IpBenchError("LOAD to " + self.hostname +
+                                   " failed (" + status["msg"] + ")")
             elif (status["code"] != 200):
                 raise IpBenchError("LOAD Failed")
         except IpBenchError:
             raise
 
     def setup(self):
-        global options
+        """
+        Set up a client. Assumes that connection is already established.
+        """
+
+        global OPTIONS
 
         try:
-            if (self.test_port == None):
+            if self.test_port is None:
                 self.test_port = 0
-            if (self.test_target == None):
-                raise IpBenchError("Must specify --test-target");
-            if (self.test_args == None):
+            if self.test_target is None:
+                raise IpBenchError("Must specify --test-target")
+            if self.test_args is None:
                 self.test_args = ""
-        
-            dbprint("[Setup]: target: " + self.test_target);
-            dbprint("[Setup]: port: " + str(self.test_port));
-            dbprint("[Setup]: args: " + self.test_args);
+
+            dbprint("[Setup]: target: " + self.test_target)
+            dbprint("[Setup]: port: " + str(self.test_port))
+            dbprint("[Setup]: args: " + self.test_args)
             self.send_command("SETUP target::" + self.test_target + "||" +
                               "port::" + repr(self.test_port) + "||"
                               'args::"' + self.test_args + '"')
             status = self.parse_return_code()
             if (status["code"] != 200):
-                raise IpBenchError("SETUP to " + self.hostname + "failed (" + str(status["code"]) + " " + status["str"] + ")")
+                raise IpBenchError("SETUP to " + self.hostname +
+                                   "failed (" + str(status["code"]) + " " + status["str"] + ")")
         except IpBenchError:
             raise
 
     def start(self):
-        # return is parsed in unmarshall
+        """
+        Send command to start a client.
+        """
         self.send_command("START")
 
     def call_test_unmarshall(self, client_data, valid):
+        """
+        Invoke unmarshall feature in test module.
+        """
         self.test_ptr.unmarshall(int(self.id), client_data, valid)
 
     def unmarshall(self):
+        """
+        Start an unmarshalling operation on the remote client and
+        try to interpret data.
+        """
         dbprint("[unmarshall] client " + self.hostname + " unmarshall ")
-        buffer = self.s.recv(128)
+        buffer = self.socket.recv(128)
         statusline = copy(buffer).decode('utf-8', errors='ignore')
         newline = statusline.find('\n')
         status = self._parse_return_code(statusline[:newline])
@@ -160,12 +217,12 @@ class IpbenchTestClient :
         else:
             raise IpBenchError("Test failed  : " + status["msg"])
 
-        #clenline is the line with the content-length in it
-        initial_content = buffer + self.s.recv(128)
+        # clenline is the line with the content-length in it
+        initial_content = buffer + self.socket.recv(128)
         clenline = copy(initial_content).decode('ascii', errors='ignore')
         newline = clenline.find('\n')
-        r = re.match("Content-length: (\d+)", clenline[:newline]);
-        if (r.group(1) == None):
+        r = re.match("Content-length: (\d+)", clenline[:newline])
+        if r.group(1) is None:
             raise IpBenchError("Invalid Content-length")
         content_length = int(r.group(1))
         dbprint("[unmarshall] client " + self.hostname +
@@ -175,22 +232,33 @@ class IpbenchTestClient :
         while (len(client_data) != content_length):
             dbprint("[unmarshall] client " + self.hostname +
                     " len(" + repr(len(client_data)) + ") < " + repr(content_length))
-            newdata = self.s.recv(content_length - len(client_data))
+            newdata = self.socket.recv(content_length - len(client_data))
             dbprint(("[unmarshall] got " + repr(len(newdata)) + " new bytes "))
             client_data = client_data + newdata
 
-        #wrapper, as the target test doesn't need to be passed an id
+        # wrapper, as the target test doesn't need to be passed an id
         self.call_test_unmarshall(client_data, valid)
 
     def close(self):
+        """
+        Terminate a connection with the client. Triggers the ipbench daemon to exit
+        and closes socket.
+        """
         self.send_command("QUIT")
-        self.s.close()
+        self.socket.close()
 
 
 # the test target is very similar, however it doesn't have the test_target
 # hostname since it has no target!
-class IpbenchTestTarget(IpbenchTestClient) :
-    def __init__(self, hostname, port, test_args, test_name, test_ptr):
+class IpbenchTestTarget(IpbenchTestClient):
+    """
+    Class encapsulating control over an ipbench target instance for the controller.
+
+    This is only used when a test which expects an instance of ipbenchd --target
+    to be running is used. All logic here is simply to manipulate that ipbenchd instance.
+    """
+
+    def __init__(self, hostname, port, test_name, test_ptr, test_args=""):
         self.hostname = hostname
         self.port = port
         self.s = None
@@ -198,34 +266,45 @@ class IpbenchTestTarget(IpbenchTestClient) :
         self.test_name = test_name
         self.test_ptr = test_ptr
         dbprint("[IpbenchTestTarget:__init__] : client " + hostname)
+        # TODO: fix inheritance here. Bad practice to have this inherit but never call super or do much with it.
 
-    #setup needs to be slightly different because it only sends the
-    #arguments
+    # setup needs to be slightly different because it only sends the
+    # arguments
     def setup(self):
-        global options
+        global OPTIONS
 
         try:
-            if (self.test_args == None):
-                self.test_args = ""
             self.send_command('SETUP args::"' + self.test_args + '"')
             status = self.parse_return_code()
-            if (status["code"] != 200):
-                raise IpBenchError("SETUP Failed (" + str(status["code"]) + " " + status["str"] + ")")
+            if status["code"] != 200:
+                raise IpBenchError(
+                    "SETUP Failed (" + str(status["code"]) + " " + status["str"] + ")")
         except IpBenchError:
             raise
 
-    #clients don't have a stop command
+    # clients don't have a stop command
     def stop(self):
+        """
+        Trigger test target to stop.
+        """
         self.send_command("STOP")
 
     def call_test_unmarshall(self, client_data, valid):
+        """
+        Begin unmarshalling operation on test module.
+        """
         self.test_ptr.unmarshall(client_data, valid)
 
 ##
-##  main function
+# main function
 ##
+
+
 def main():
-    global options
+    """
+    Main function for ipbench tester.
+    """
+    global OPTIONS
     clients = []
     targets = []
 
@@ -262,10 +341,10 @@ def main():
                       default=0)
 
     parser.add_option("--target-test", dest="target_test", action="store", type="string",
-                      help="Companion test to run on the DUT", default = None)
+                      help="Companion test to run on the DUT", default=None)
 
     parser.add_option("--target-test-hostname", dest="target_test_hostname", action="store", type="string",
-                      help="The IP address or hostname to connect to the target test machine", default = None)
+                      help="The IP address or hostname to connect to the target test machine", default=None)
 
     parser.add_option("--target-test-args", dest="target_test_args", action="store", type="string",
                       help="Arguments for the companion test to run on the DUT")
@@ -282,13 +361,12 @@ def main():
                       help="Arguments for the controller for the target test",
                       default=None)
 
-    (options, args) = parser.parse_args()
+    (OPTIONS, _) = parser.parse_args()
 
     # read in a config file, if specified, and build up a list of clients
-    if (options.config):
-        dbprint("Reading config from " + options.config)
-        doc = parse(options.config).getroot()
-
+    if OPTIONS.config:
+        dbprint("Reading config from " + OPTIONS.config)
+        doc = parse(OPTIONS.config).getroot()
 
         tests = doc.findall('test')
         if (len(tests) > 1):
@@ -297,15 +375,16 @@ def main():
 
         # go through attributes for <test>
         for test in tests:
-            options.test = str(test.get("name", None))
-            options.test_args = str(test.get('args', ''))
-            options.test_port = int(test.get('port', '0'))
-            options.test_target = str(test.get('target', ''))
-            options.controller_args = str(test.get('controller_args', ''))
+            OPTIONS.test = str(test.get("name", None))
+            OPTIONS.test_args = str(test.get('args', ''))
+            OPTIONS.test_port = int(test.get('port', '0'))
+            OPTIONS.test_target = str(test.get('target', ''))
+            OPTIONS.controller_args = str(test.get('controller_args', ''))
 
         # the test should be known by now
-        if (options.test == None):
-            print("Error in config: please specify a test with either --test or in <test>")
+        if OPTIONS.test is None:
+            print(
+                "Error in config: please specify a test with either --test or in <test>")
             sys.exit(1)
 
         # go through each <client>, override default values from attributes and add it to the
@@ -313,19 +392,23 @@ def main():
         data = tests[0].findall('./client')
         for cclients in data:
             newclient = {
-                "hostname":None,
-                "port":options.port,
-                "test_port":options.test_port,
-                "test_args":str(options.test_args),    # careful with encodings
-                "test_target":str(options.test_target)
-                }
+                "hostname": None,
+                "port": OPTIONS.port,
+                "test_port": OPTIONS.test_port,
+                # careful with encodings
+                "test_args": str(OPTIONS.test_args),
+                "test_target": str(OPTIONS.test_target)
+            }
             newclient["hostname"] = cclients.get('hostname', None)
-            newclient["port"] = int(cclients.get('port', options.port))
-            newclient["test_port"] = int(cclients.get('test_port', options.test_port))
-            newclient["test_args"] = cclients.get('test_args', str(options.test_args))
-            newclient["test_target"] = cclients.get('test_target', str(options.test_target))
+            newclient["port"] = int(cclients.get('port', OPTIONS.port))
+            newclient["test_port"] = int(
+                cclients.get('test_port', OPTIONS.test_port))
+            newclient["test_args"] = cclients.get(
+                'test_args', str(OPTIONS.test_args))
+            newclient["test_target"] = cclients.get(
+                'test_target', str(OPTIONS.test_target))
 
-            if (newclient["hostname"] == None):
+            if newclient["hostname"] is None:
                 print("Please specifiy a hostname for the client!")
                 sys.exit(1)
             clients.append(newclient)
@@ -334,83 +417,87 @@ def main():
         target_tests = doc.findall("target_test")
         for target_test in target_tests:
             target_test_name = target_test.get('name')
-            options.target_test_args = target_test.get('args')
-            options.target_controller_args = str(target_test.get('controller_args'))
+            OPTIONS.target_test_args = target_test.get('args')
+            OPTIONS.target_controller_args = str(
+                target_test.get('controller_args'))
 
             # it is possible that there will be multiple <target_test>
             # sections, each  with multiple <targets> in them.  so
             # make sure we only select those targets for the target
-            # test we are currently looking at. 
-            tclients = doc.findall("target_test[@name=\'"+target_test_name+"\']/target")
+            # test we are currently looking at.
+            tclients = doc.findall(
+                "target_test[@name=\'"+target_test_name+"\']/target")
             if (not (len(tclients) > 0)):
                 print("Please specify some targets in the <target_test> section!")
                 sys.exit(1)
             for tclient in tclients:
                 newtarget = {
-                    "hostname":options.target_test_hostname,
-                    "port":options.target_test_port,
-                    "test_args":str(options.target_test_args),  #workaround -- by default
-                    "test": str(target_test_name)               #comes encoded in utf-16
-                    }
+                    "hostname": OPTIONS.target_test_hostname,
+                    "port": OPTIONS.target_test_port,
+                    # workaround -- by default
+                    "test_args": str(OPTIONS.target_test_args),
+                    "test": str(target_test_name)  # comes encoded in utf-16
+                }
                 for arg in list(tclient.keys()):
                     newtarget["hostname"] = tclient.get('hostname',
-                                                        options.target_test_hostname)
-                    newtarget["port"] = int(tclient.get('port', options.target_test_port))
-                    newtarget["test_args"] = str(tclient.get('test_args', options.target_test_args))
+                                                        OPTIONS.target_test_hostname)
+                    newtarget["port"] = int(tclient.get(
+                        'port', OPTIONS.target_test_port))
+                    newtarget["test_args"] = str(tclient.get(
+                        'test_args', OPTIONS.target_test_args))
 
-                    if (newtarget["hostname"] == None):
+                    if newtarget["hostname"] is None:
                         print("Please specify a hostname for the target!")
                         sys.exit(1)
 
                 targets.append(newtarget)
 
     # finally, append things that are specified from the command line
-    if (options.clients):
-        if (options.test == None):
+    if OPTIONS.clients:
+        if OPTIONS.test is None:
             print("Please specify a test with --test!")
             sys.exit(1)
-        for client in options.clients:
+        for client in OPTIONS.clients:
             newclient = {
-                "hostname":client,
-                "port":options.port,
-                "test_port":options.test_port,
-                "test_args":options.test_args,
-                "test_target":options.test_target
-                }
+                "hostname": client,
+                "port": OPTIONS.port,
+                "test_port": OPTIONS.test_port,
+                "test_args": OPTIONS.test_args,
+                "test_target": OPTIONS.test_target
+            }
             clients.append(newclient)
 
     # you are more limited in your target test choices from the
     # command line, for example you can only specify one target
     # and one test.  but the simple case is covered
-    if (options.target_test):
-        if (options.target_test_hostname == None):
+    if OPTIONS.target_test:
+        if OPTIONS.target_test_hostname is None:
             print("Please specify a target test hostname with --target-test-hostname!")
             sys.exit(1)
         newtarget = {
-            "hostname": options.target_test_hostname,
-            "port": options.target_test_port,
-            "test_args": options.target_test_args,
-            "test": options.target_test
-            }
+            "hostname": OPTIONS.target_test_hostname,
+            "port": OPTIONS.target_test_port,
+            "test_args": OPTIONS.target_test_args,
+            "test": OPTIONS.target_test
+        }
         targets.append(newtarget)
 
-
     # sanity check stuff
-    if (options.test == None):
+    if OPTIONS.test is None:
         print("Please specify a test")
         sys.exit(1)
 
-    if (not len(clients)):
+    if len(clients) == 0:
         print("Please specify some clients")
         sys.exit(1)
 
     # seeing as all clients are running the same test, we
     # only need one object to interact with them.
     client_test = ipbench_client
-    if (options.debug):
+    if OPTIONS.debug:
         client_test.enable_debug()
-    client_test.load_plugin(options.test)
-    client_test.setup_controller(len(clients), options.controller_args)
+    client_test.load_plugin(OPTIONS.test)
+    client_test.setup_controller(len(clients), OPTIONS.controller_args)
 
     try:
         # setup each of the targets
@@ -418,10 +505,10 @@ def main():
             dbprint("[main] setting up target " + target["hostname"])
 
             target["shuntobj"] = ipbench_target
-            if (options.debug):
+            if OPTIONS.debug:
                 target["shuntobj"].enable_debug()
             target["shuntobj"].load_plugin(target["test"])
-            target["shuntobj"].setup_controller(options.target_controller_args)
+            target["shuntobj"].setup_controller(OPTIONS.target_controller_args)
 
             target["testobj"] = IpbenchTestTarget(target["hostname"], target["port"],
                                                   target["test_args"], target["test"],
@@ -430,27 +517,27 @@ def main():
             target["testobj"].setup()
 
         # setup each of the clients.
-        id = 0
+        client_id = 0
         for client in clients:
             dbprint("[main] setting up client " + client["hostname"])
 
             if client["test_port"] == 0:
-                    client["test_port"] = client_test.get_default_port()
+                client["test_port"] = client_test.get_default_port()
 
             client["testobj"] = IpbenchTestClient(client["hostname"], client["port"],
                                                   client["test_target"], client["test_port"],
-                                                  client["test_args"],id,options.test,client_test)
+                                                  client["test_args"], client_id, OPTIONS.test, client_test)
             client["testobj"].connect()
-            id = id + 1
+            client_id = client_id + 1
             client["testobj"].setup()
 
-        #start the target test(s) first (wait for an OK response)
+        # start the target test(s) first (wait for an OK response)
         for target in targets:
             target["testobj"].start()
 
-        #send START command (error responses will be polled for below)
+        # send START command (error responses will be polled for below)
         for client in clients:
-            dbprint("[main] client "+ client["hostname"] + " start")
+            dbprint("[main] client " + client["hostname"] + " start")
             client["testobj"].start()
 
         wait_to_read = []
@@ -460,40 +547,43 @@ def main():
         for target in targets:
             wait_for_error.append(target["testobj"])
 
-        #simply select() on all the fd's of the clients
-        #(client["testobj"].fileno() provides the fd)
-        #once they have data, unmarshall it.
+        # simply select() on all the fd's of the clients
+        # (client["testobj"].fileno() provides the fd)
+        # once they have data, unmarshall it.
         while len(wait_to_read) > 0:
-            (toread, towrite, toexcept) = select.select(wait_to_read, [], [], 0.2)
-            for client in toread:
+            (to_read, to_write, to_except) = select.select(
+                wait_to_read, [], [], 0.2)
+            for client in to_read:
                 client.unmarshall()
                 wait_to_read.remove(client)
-            #additionally; poll any targets incase they have returned
-            #some sort of error and we need to abort.  don't wait around
-            #for this however
-            (toread, towrite, toexcept) = select.select(wait_for_error, [], [], 0.2)
-            if len(toread) > 0 :
+            # additionally; poll any targets incase they have returned
+            # some sort of error and we need to abort.  don't wait around
+            # for this however
+            (to_read, to_write, to_except) = select.select(
+                wait_for_error, [], [], 0.2)
+            if len(to_read) > 0:
                 raise IpBenchError("Target returned an error!")
 
-        #once all clients have reported in, stop any target tests
-        #and get their data
+        # once all clients have reported in, stop any target tests
+        # and get their data
         for target in targets:
             target["testobj"].stop()
             target["testobj"].unmarshall()
 
-        #all the clients aggregate their data and output() shows it
+        # all the clients aggregate their data and output() shows it
         client_test.output()
 
-        #each target gets to display it's own output
+        # each target gets to display it's own output
         for target in targets:
             target["shuntobj"].output()
 
-    except IpBenchError as e:
-        print("Ipbench failed : " + e.value)
+    except IpBenchError as err:
+        print("Ipbench failed : " + err.value)
 
-    #close all connections and quit
+    # close all connections and quit
     for client in clients + targets:
         client["testobj"].close()
+
 
 if __name__ == "__main__":
     main()
