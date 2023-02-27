@@ -1,0 +1,346 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="content-type"
+ content="text/html; charset=ISO-8859-1">
+  <title>ipbench - latency test</title>
+</head>
+<body>
+<h1>ipbench - latency test</h1>
+<h2>About the test</h2>
+The ipbench latency test allows you to measure latency between a number
+of distributed clients and a target device. <br>
+<h2>Running the test</h2>
+<h3 style="color: rgb(255, 0, 0);">Client Machine</h3>
+The client machine need only be running the <span
+ style="font-family: monospace;">ipbenchd </span>daemon.<span
+ style="font-weight: bold;"><br>
+</span>
+<h3 style="color: rgb(255, 0, 0);"><span style="font-weight: bold;">Controller</span></h3>
+<h3><span style="font-weight: bold;"></span></h3>
+<h4>Running the test</h4>
+There are a number of options that can be passed to the test.&nbsp; The
+options should be passed with the <span style="font-family: monospace;">--test-args</span>
+command line paramater in a simple <span
+ style="font-family: monospace;">"command=value,command1=value1"</span>
+format (note no whitespace).&nbsp;&nbsp; The test options are<br>
+<br>
+<table cellpadding="2" cellspacing="2" border="1"
+ style="text-align: left; width: 100%; height: 100%;">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; font-weight: bold; color: rgb(102, 51, 51);">Argument<br>
+      </td>
+      <td
+ style="vertical-align: top; font-weight: bold; color: rgb(102, 51, 51);">Description<br>
+      </td>
+      <td
+ style="vertical-align: top; font-weight: bold; color: rgb(102, 51, 51);">Example<br>
+      </td>
+      <td
+ style="vertical-align: top; font-weight: bold; color: rgb(102, 51, 51);">Default<br>
+      </td>
+      <td style="vertical-align: top;"><span
+ style="color: rgb(102, 51, 51); font-weight: bold;">Notes</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; vertical-align: middle;">
+      <pre>bps|Mbps</pre>
+      </td>
+      <td style="vertical-align: middle; text-align: left;">Throughput
+to attempt in bits per second or millions of bits per second <span
+ style="font-weight: bold;">for each client</span> (i.e. total to
+attempt is&nbsp; this argument * number of clients)<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">
+      <pre>bps=100000000<br>Mbps=100</pre>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">
+      <pre>10Mbps</pre>
+      </td>
+      <td style="vertical-align: top;"><small><small><br>
+      </small></small></td>
+    </tr>
+    <tr>
+      <td style="text-align: center; vertical-align: middle;">
+      <pre>size<br></pre>
+      </td>
+      <td style="vertical-align: middle; text-align: left;">Size of
+message in bytes<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">
+      <pre>size=1024<br></pre>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">
+      <pre>100<br></pre>
+      </td>
+      <td style="vertical-align: top;"><small><small>Small packet sizes
+will increasingly not work with increasing throughputs.&nbsp;
+Experimentation is best, but be careful about things like fragmentation
+that may effect results.<br>
+      </small></small></td>
+    </tr>
+    <tr>
+      <td style="text-align: center; vertical-align: middle;">
+      <pre>sockopts<br></pre>
+      </td>
+      <td style="vertical-align: middle; text-align: left;">Set socket
+options on the client.&nbsp; You can currently set most standard socket
+options with
+this command.&nbsp; See the <span style="font-family: monospace;">socket
+(7)</span> man page for more details about these options.<br>
+      <ul style="font-family: monospace;">
+        <li>SO_KEEPALIVE</li>
+        <li>SO_REUSEADDR</li>
+        <li>SO_BROADCAST</li>
+        <li>SO_NODELAY</li>
+        <li>SO_LOWDELAY</li>
+        <li>SO_THROUGHPUT</li>
+        <li>SO_SNDBUF=number</li>
+        <li>SO_RCVBUF=number</li>
+        <li>SO_SNDLOWAT=number</li>
+        <li>SO_RCVLOWAT=number</li>
+        <li>SO_SNDTIMEO=number</li>
+        <li>SO_RCVTIMEO=number</li>
+      </ul>
+Options should be separated with a semi-colon (;)<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">
+      <pre>sockopts=SO_NODELAY;SO_RCVBUF=16384<br></pre>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">
+      <pre>N/A<br></pre>
+      </td>
+      <td style="vertical-align: top;"><small><small><br>
+      </small></small></td>
+    </tr>
+    <tr>
+      <td style="text-align: center; vertical-align: middle;">
+      <pre>warmup<br></pre>
+      </td>
+      <td style="vertical-align: middle; text-align: left;">Warmup time
+in seconds<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">
+      <pre>warmup=20<br></pre>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">
+      <pre>5<br></pre>
+      </td>
+      <td style="vertical-align: top;" rowspan="2" colspan="1"><small><small>If
+you are using the companion test, make sure you pass the same warmup
+and cooldown times with the <span style="font-family: monospace;">--target-args</span>
+command so the target knows what results to ignore.<br>
+      </small></small><small><small><br>
+      </small></small></td>
+    </tr>
+    <tr>
+      <td style="text-align: center; vertical-align: middle;">
+      <pre>cooldown<br></pre>
+      </td>
+      <td style="vertical-align: middle; text-align: left;">Cooldown
+time in seconds<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">
+      <pre>cooldown=20<br></pre>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">
+      <pre>5<br></pre>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; vertical-align: middle;">
+      <pre>socktype<br></pre>
+      </td>
+      <td style="vertical-align: middle; text-align: left;">Socket type
+(UDP or TCP)<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">
+      <pre>socktype=udp<br></pre>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">
+      <pre>tcp<br></pre>
+      </td>
+      <td style="vertical-align: top;"><small><small><br>
+      </small></small></td>
+    </tr>
+    <tr>
+      <td style="text-align: center; vertical-align: middle;">
+      <pre>drop<br></pre>
+      </td>
+      <td style="vertical-align: middle; text-align: left;">Time before
+considering a UDP packet dropped, in seconds<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">
+      <pre>drop=5<br></pre>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">
+      <pre>2<br></pre>
+      </td>
+      <td style="vertical-align: top;"><small><small><br>
+      </small></small></td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<h4>Test output</h4>
+The test output is a simple list of comma separated numbers in the
+following format<br>
+<br>
+<pre>Achieved Throughput,Requested Throughput,Sent Throughput,Min,Avg,Max,Standard Deviation,Median<br><br></pre>
+<table cellpadding="2" cellspacing="2" border="1"
+ style="text-align: left; width: 946px; height: 362px;">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; font-weight: bold; color: rgb(102, 51, 51);">Measure<br>
+      </td>
+      <td
+ style="vertical-align: top; font-weight: bold; color: rgb(102, 51, 51);">Description<br>
+      </td>
+      <td
+ style="vertical-align: top; font-weight: bold; color: rgb(102, 51, 51);">Units<br>
+      </td>
+      <td
+ style="vertical-align: top; font-weight: bold; color: rgb(102, 51, 51);">Notes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">
+      <pre>Achieved Throughput</pre>
+      </td>
+      <td style="vertical-align: top;">(The number of packets received
+* the packet size) / (test time)<br>
+      </td>
+      <td style="vertical-align: top;">
+      <pre>bits per second</pre>
+      </td>
+      <td style="vertical-align: top;"><small><small>Each client works
+out it's achieved throughput, the total shown is the sum of each
+client's individal throughput<br>
+      </small></small></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">
+      <pre>Requested Throughput</pre>
+      </td>
+      <td style="vertical-align: top;">The throughput requested with
+the bps argument<br>
+      </td>
+      <td style="vertical-align: top;">
+      <pre>bits per second</pre>
+      </td>
+      <td style="vertical-align: top;"><small><small><br>
+      </small></small></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">
+      <pre>Sent Throughput</pre>
+      </td>
+      <td style="vertical-align: top;">(The number of packets sent *
+the packet size) / (test time)<br>
+      </td>
+      <td style="vertical-align: top;">
+      <pre>bits per second</pre>
+      </td>
+      <td style="vertical-align: top;"><small><small>This should not
+differ from achieved throughput&nbsp; unless many packets are sent but
+not received (ie. dropped)<br>
+      </small></small></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">
+      <pre>Min</pre>
+      </td>
+      <td style="vertical-align: top;">Minimum latency measured<br>
+      </td>
+      <td style="vertical-align: top;">
+      <pre>microseconds</pre>
+      </td>
+      <td style="vertical-align: middle;" rowspan="5" colspan="1"><small><small>Each
+client returns <span style="font-weight: bold;">all</span> of it's
+data to the controller where these figures are calculated.<br>
+      </small></small></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">
+      <pre>Avg</pre>
+      </td>
+      <td style="vertical-align: top;">Average latency measured<br>
+      </td>
+      <td style="vertical-align: top;">
+      <pre>microseconds</pre>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">
+      <pre>Max</pre>
+      </td>
+      <td style="vertical-align: top;">Maxiumum latency measured<br>
+      </td>
+      <td style="vertical-align: top;">
+      <pre>microseconds</pre>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">
+      <pre>Standard Deviation</pre>
+      </td>
+      <td style="vertical-align: top;">Standard deviation of measured
+latencies.<br>
+      </td>
+      <td style="vertical-align: top;">
+      <pre>microseconds</pre>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">
+      <pre>Median</pre>
+      </td>
+      <td style="vertical-align: top;">Median latency<br>
+      </td>
+      <td style="vertical-align: top;">
+      <pre>microseconds</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<h3 style="color: rgb(255, 0, 0);">Target Machine</h3>
+The target machine need only be running a standard <span
+ style="font-weight: bold;">echo</span> service.&nbsp; There are a
+number of ways you can achieve this. <br>
+<ol>
+  <li>Enable the <span style="font-weight: bold;">echo</span> service
+via <span style="font-family: monospace;">inetd</span></li>
+  <ul>
+    <li>Many distributions have echo disabled by default.&nbsp; To
+enable it make sure you have lines like the following in <span
+ style="font-family: monospace;">/etc/inetd.conf</span><br>
+      <pre>#:INTERNAL: Internal services<br>echo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stream&nbsp; tcp&nbsp;&nbsp;&nbsp;&nbsp; nowait&nbsp; root&nbsp;&nbsp;&nbsp; internal<br>echo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; dgram&nbsp;&nbsp; udp&nbsp;&nbsp;&nbsp;&nbsp; wait&nbsp;&nbsp;&nbsp; root&nbsp;&nbsp;&nbsp; internal<br></pre>
+By default this will run on port <span style="font-weight: bold;">7</span>.&nbsp;
+      <br>
+    </li>
+  </ul>
+  <li>There are two included stand-alone echo servers, <span
+ style="font-family: monospace;">tcp-echo</span> and <span
+ style="font-family: monospace;">udp-echo</span>.&nbsp; These are in <span
+ style="font-family: monospace;">doc/programs</span><br>
+  </li>
+</ol>
+If you want to measure CPU usage on the target machine with the latency
+companion test, the<span style="font-family: monospace;"> ipbenchtd</span>
+daemon must be running on it.&nbsp;&nbsp; Specifiy the hostname of the
+target
+machine&nbsp; with the <span style="font-family: monospace;">--target</span>
+option, and pass in arguments via
+<span style="font-family: monospace;">--target-args</span>.&nbsp; There
+are only two arguments, <span style="font-family: monospace;">warmup</span>
+and <span style="font-family: monospace;">cooldown</span>; these
+should be passed as mentioned above.<br>
+<h3 style="color: rgb(255, 0, 0);"><span style="font-weight: bold;">Example</span></h3>
+See the <a href="samples.html">example run</a><br>
+</body>
+</html>

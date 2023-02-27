@@ -1,0 +1,14 @@
+IPBENCH
+-------
+
+This is ipbench v2, based on python daemons with a extensible plugin
+architecture.  Work is progressing on this version, and we welcome
+input.
+
+See doc/README for more information.
+
+There is specific documentation on the tests in docs/tests/
+
+Also please see the webpage at http://ipbench.sourceforge.net for more
+information
+

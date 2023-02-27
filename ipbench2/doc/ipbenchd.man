@@ -1,0 +1,45 @@
+.TH "ipbenchd" "1" "17 Dec 2003" "Ian Wienand" ""
+.SH "NAME"
+.LP 
+ipbenchd \- Client daemon for the ipbench testing suite
+.SH "SYNTAX"
+.LP 
+ipbenchd [\fB\-\-plugindir\fP=\fIpath\fP] [\fB\-\-port\fP=\fIport\fP] [\fB\-\-nofork\fP] [\fB\-v\fP] [\fB\-V\fP] [\fB\-h\fP|\fB\-\-help\fP]
+.SH "DESCRIPTION"
+.LP 
+This program is the client portion of the ipbench testing suite.  Each client must be running this daemon to receive commands from the controlling node.
+.SH "OPTIONS"
+.LP 
+.TP 
+<fb>\-\-plugindir\fR <\fIpath\fP>
+Path to the ipbench test plugins
+.TP 
+\fB\-\-port\fR <\fIport\fP>
+Makes the daemon listen on the specified \fIport\fP.
+.TP 
+\fB\-\-nofork\fR
+Do not fork the daemon into the background.
+.TP 
+\fB\-v\fR
+Be more verbose with output.
+.TP 
+\fB\-h\fP|\fB\-\-help\fP
+Output help information.
+.TP 
+\fB\-V\fR
+Version information.
+.SH "FILES"
+.LP 
+(none)
+.SH "ENVIRONMENT VARIABLES"
+.LP 
+(none)
+.SH "EXAMPLES"
+.LP 
+examples
+.SH "AUTHORS"
+.LP 
+Ian Wienand <ianw@gelato.unsw.edu.au>
+.SH "SEE ALSO"
+.LP 
+ipbench(1)

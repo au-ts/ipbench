@@ -1,0 +1,48 @@
+<!-- Your config file needs to be in ipbench tags -->
+<ipbench>
+
+ <!-- 
+      Then you can have *one* test section, that describes the test to run. 
+      The only valid attribute is the test name 
+ -->
+ <test name="nfsstone">
+
+  <!-- 
+       Each client can specify a number of arguments; these will override defaults 
+       passed from the command line.  The arguments are 
+
+       * hostname : the hostname of the machine ipbenchd is running on
+       * port : the port the ipbenchd daemon is listening on
+       * test_target : the hostname the test should target
+       * test_port : the port the test should run on
+       * test_args : any arguments to be passed to this client
+  -->
+<!--  
+  <client hostname="mingus" port="8036" test_target="target1"/>
+  <client hostname="mingus" test_target="vanilla" test_port="2222" test_args="/mnt/vanilla /tmp/nfsstonelock"/>
+  <client hostname="quasar" test_target="vanilla" test_port="2222" test_args="/mnt/vanilla /tmp/nfsstonelock"/>
+-->
+  <client hostname="tinny0" test_target="vanilla" test_port="2222" test_args="/mnt/vanilla /tmp/nfsstonelock 10 20"/>
+  <client hostname="tinny9" test_target="vanilla" test_port="2222" test_args="/mnt/vanilla /tmp/nfsstonelock 10 20"/> 
+  <client hostname="amaretto" test_target="vanilla" test_port="2222" test_args="/mnt/vanilla /tmp/nfsstonelock 10 20"/>
+ </test>
+
+ <!-- 
+      You can then target_test sections, if you have something that 
+      needs to run on the target machine.  Theoretically, you could setup a few tests to 
+      run on the target by having daemons on different ports, it might get a bit hairy though!
+      The only valid attribute is the test name 
+ -->
+ <!-- <target_test name="latency_target"> -->
+  <!-- 
+       as above, have your target machines to run this test listed here.  
+       The valid attributes are 
+       * hostname  : the hostname of the machine the ipbenchd target daemon is 
+                     running on
+       * port      : the port ipbenchd is listening on
+       * test_args : arguments to be passed 
+  -->
+  <!-- <target hostname="target" test_args="asdf"/> -->
+ <!-- </target_test> -->
+</ipbench>
+

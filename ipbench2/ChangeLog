@@ -1,0 +1,128 @@
+2021-09-27  Peter Chubb  <peter.chubb@unsw.edu.au>
+
+	* Update to Python3
+
+2010-03-04  Peter Chubb  <peterc@gelato.unsw.edu.au>
+
+	* Depend on python-lxml to get full XPATH support for ipbench
+	  controller. 
+	* nfsstone fixes.  Used to dump core in ipbenchd when used.
+	
+
+2010-02-10  Peter Chubb  <peterc@gelato.unsw.edu.au>
+
+	* nfs_latency fixes -- now obeys similar arguments to the latency
+	test (warmup, cooldown in seconds, samples=)
+	* Updated manual.
+
+2010-02-02  Peter Chubb  <peterc@gelato.unsw.edu.au>
+
+	* Fix compilation on Ubuntu Jaunty.
+
+2006-08-28  Ian Wienand  <ianw@localdomain>
+
+	* src/pymod/ipbench.c: fix up some warnings
+	* src/pymod/ipbench.i.in: move around so that functions have
+	definitions, fixes a few warnings.
+
+2006-03-08  Peter Chubb  <peterc@gelato.unsw.edu.au>
+
+	* debian/ipbench-plugins.install: Don't install libraries as part
+	of this package; instead depend on libipbench package (which is
+	done automatically).
+
+2006-03-07  Ian Wienand  <ianw@gelato.unsw.edu.au>
+
+	* src/pymod/Makefile.am : respect DESTDIR
+
+2005-06-29  Ian Wienand  <ianw@gelato.unsw.edu.au>
+
+	* src/pymod/Makefile.am : install libraries in python site-dir
+
+2005-06-23  Ian Wienand  <ianw@gelato.unsw.edu.au>
+
+	* src/tests/latency/microuptime* : move into 
+	* src/libs/* : add microuptime into util library
+	* src/tests/latency/latency.[c|h] : remove references to
+	microuptime as moved into util library.
+
+2005-06-21  Ian Wienand  <ianw@gelato.unsw.edu.au>
+
+	* src/tests/nfs_latency/*: start a new nfs latency test, written
+	by Luke Macpherson.
+
+2005-05-05  Ian Wienand  <ianw@gelato.unsw.edu.au>
+
+	* src/ipbench.py, src/pymod/*, src/tests/* : modify API to have a
+	controller setup function and phase.  This was we can pass
+	arguments to the controller.
+	* src/tests/latency.c : add ability to dump out client results to
+	a file
+
+2005-03-02  Ian Wienand  <ianw@gelato.unsw.edu.au>
+
+	* src/tests/latency/latency.c : modify printf specifier for
+	tick_rate
+	* src/ipbench.py : add more information to execption
+	errors including return code and error strings.
+
+2005-02-24  Ian Wienand  <ianw@gelato.unsw.edu.au>
+
+	* src/tests/cpu_target_lukem/cpu_target_lukem.c : wait on a
+	condition variable to support FreeBSD.  also nice() process before
+	starting usage thread.
+
+2005-02-22  Ian Wienand  <ianw@gelato.unsw.edu.au>
+
+	* many: changes to bring consisentcy to types; turn on -Wall,
+	-Werror; modify to build
+	* configure.in: version to 2.0.2
+
+2005-02-18  Mark Tsui <markt@cse.unsw.edu.au>
+
+        * src /tests/latency/microuptime.h:
+	* src /tests/cpu_target_lukem/cpu_target_lukem.h: added support for amd64
+
+2005-02-18  Mark Tsui <markt@cse.unsw.edu.au>
+
+	* src/tests/latency.c(latency_marshall): don't use size_t but int
+
+2005-02-18  Ian Wienand  <ianw@gelato.unsw.edu.au>
+
+	* src/pymod/ipbench.c(marshall) : don't pass in uninitalised pointers
+	* src/tests/wrapper/{client|target}_wrapper.c: as above
+	* src/ipbenchd.py : set reuse addr to stop annoying socket in use problem
+
+2005-01-25  Ian Wienand  <ianw@gelato.unsw.edu.au>
+
+	* src/tests/cpu_target_lukem/* : add lukem cpu usage test
+
+2004-12-21  Ian Wienand  <ianw@gelato.unsw.edu.au>
+
+	* src/pymod/Makefile.am : install using DESTDIR
+	* debian/* : debianisation
+
+2004-10-21  Darren Williams  <dsw@quasar>
+
+	* Intoduce a common ipbench2 include directory
+	* Add bswap.h to new include directory, code taken
+	  from latency.h
+
+2004-10-20  Darren Williams  <dsw@gelato.unsw.edu.au>
+
+	* Import nfsstone benchmark to src/tests/nfsstone.
+	* See README in src/tests/nfsstone for details on the nfsstone benchmark.
+
+2004-10-20  Ian Wienand  <ianw@gelato.unsw.edu.au>
+	* src/ipbenchd.py : make mmap use -1 as the fd so it is portable
+	* src/tests/http/Makefile.am : add to make sure make dist works
+	* configure.in : update to make sure all makefile are created for make dist,
+	add --enable-tests option to only build some tests.
+	* src/tests/Makefile.am : change to follow conditional compliation from --enable-tests
+	* src/tests/nfsstone : added by dsw, working in beta stage
+	* src/pymod/Makefile.am : do not redefine libdir to install python libraries
+	* src/pymod/ipbench.c : use pkglibdir for search path for plugins
+
+2004-09-27  Ian Wienand  <ianw@gelato.unsw.edu.au>
+
+	* restart : restart this ChangeLog for V2

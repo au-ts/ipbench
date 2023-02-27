@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="content-type"
+ content="text/html; charset=ISO-8859-1">
+  <title>ipbench latency test sample</title>
+</head>
+<body>
+<h1>ipbench latency test sample</h1>
+<br>
+Here is an example run of ipbench with only a single client to
+localhost (i.e loopback). <br>
+<br>
+<table style="text-align: left; width: 95%;" border="1" cellpadding="2"
+ cellspacing="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; width: 33%; font-weight: bold; background-color: rgb(204, 204, 255);"><big>Controller<br>
+      </big></td>
+      <td
+ style="vertical-align: top; width: 33%; background-color: rgb(255, 204, 153); font-weight: bold;"><big>Tester(s)<br>
+      </big></td>
+      <td
+ style="vertical-align: top; width: 33%; background-color: rgb(204, 255, 255); font-weight: bold;"><big>Target<br>
+      </big></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;" rowspan="1" colspan="3"><span
+ style="font-weight: bold; color: rgb(255, 0, 0);">1. Start daemons</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(204, 204, 255);">
+      <pre><small><br></small></pre>
+      </td>
+      <td
+ style="vertical-align: top; background-color: rgb(255, 204, 153);">
+      <pre><small>$ python ./ipbenchd.py </small></pre>
+      </td>
+      <td
+ style="vertical-align: top; background-color: rgb(204, 255, 255);">
+      <pre><small>$ python ./ipbenchd --target</small></pre>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;" rowspan="1" colspan="3"><span
+ style="font-weight: bold; color: rgb(255, 0, 0);">2. Execute test</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(204, 204, 255);">
+      <pre><small>$ python ./ipbench.py --test=latency <br>--test-args="bps=6000000000,size=16384" <br>--client=localhost --test-target=localhost <br>--target=localhost<br></small></pre>
+      </td>
+      <td
+ style="vertical-align: top; background-color: rgb(255, 204, 153);">
+      <pre><small><br></small></pre>
+      </td>
+      <td
+ style="vertical-align: top; background-color: rgb(204, 255, 255);">
+      <pre><small><br></small></pre>
+      </td>
+    </tr>
+    <tr style="color: rgb(255, 0, 0); font-weight: bold;">
+      <td colspan="3" rowspan="1" style="vertical-align: top;">3. Setup
+process begins</td>
+    </tr>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(204, 204, 255);">
+      <pre><small>Send IPBENCH_SETUP to localhost.<br>Send IPBENCH_SETUP to target localhost.<br></small></pre>
+      </td>
+      <td
+ style="vertical-align: top; background-color: rgb(255, 204, 153);">
+      <pre><small><br><br>Accepted new connection (3).<br>Running test latency on target localhost (port 7).<br>testing at 6000000000bps, 16384 byte chunks<br>Socket type is TCP.<br>Setting TCP_NODELAY<br>Latency setup done.<br>Setup OK.<br><br></small></pre>
+      <pre><small><br></small></pre>
+      </td>
+      <td
+ style="vertical-align: top; background-color: rgb(204, 255, 255);">
+      <pre><small><br><br>Accepted new connection (4).<br>calibrating: 1587206 loops/sec<br>calibrating: 1576237 loops/sec<br>calibrating: 1566651 loops/sec<br>calibrating: 1545289 loops/sec<br>calibrated OK. 1545289 loops/sec<br>Setup OK.<br><br></small></pre>
+      <pre><small><br></small></pre>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="3" rowspan="1" style="vertical-align: top;"><span
+ style="font-weight: bold; color: rgb(255, 0, 0);">4. Test starts</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(204, 204, 255);">
+      <pre><small>Send IPBENCH_START to localhost<br>Send IPBENCH_START to target localhost</small></pre>
+      </td>
+      <td
+ style="vertical-align: top; background-color: rgb(255, 204, 153);">
+      <pre><small><br><br>Latency test start.<br>transferred 3276800000 bytes in 11244092 microseconds<br>200000 recvs 200000 sends (200000 samples)<br>0 late packets.<br>0 dropped packets.<br>achieved 2331393232 bps<br>min rtt was 139 us<br>average rtt was 168 us<br>max rtt was 136239 us<br>rtt std dev was 886919 us^2<br>median rtt was 145 us<br>200000 sends, 200000 receives<br>EAGAIN - send 6106 recv 6116 | RETRYS send 1 recv 0<br>Latency test complete.</small></pre>
+      <pre><small><br></small></pre>
+      </td>
+      <td
+ style="vertical-align: top; background-color: rgb(204, 255, 255);">
+      <pre><small><br><br>...<br>System load: 95.9%<br>System load: 95.9%<br>System load: 95.9%<br>System load: 95.7%<br>...</small></pre>
+      <pre><small><br></small></pre>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="3" rowspan="1" style="vertical-align: top;"><span
+ style="font-weight: bold; color: rgb(255, 0, 0);">4. Marshall return
+data<br>
+      </span></td>
+    </tr>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(204, 204, 255);">
+      <pre style="background-color: rgb(204, 204, 255);"><br><br><br><br><br>Got IPBENCH_DATA_RETURN from localhost.<br>Unmarshall arguments.<br>Signalling controller data read OK</pre>
+      <pre style="background-color: rgb(204, 204, 255);"><br>Sending IPBENCH_STOP to target.<br>Getting data from target.<br>Got IPBENCH_DATA_RETURN from target.<br>Signalling target data read OK</pre>
+      <pre><br></pre>
+      </td>
+      <td
+ style="vertical-align: top; background-color: rgb(255, 204, 153);">
+      <pre>Test ran for 31.738948 seconds.<br>Latency marshall arguments.<br>Sending back IPBENCH_DATA_RETURN<br>Sent data (1600072 bytes)<br>Waiting for OK response<br><br><br><br>OK Received</pre>
+      <pre style="background-color: rgb(255, 204, 153);"><br></pre>
+      </td>
+      <td
+ style="vertical-align: top; background-color: rgb(204, 255, 255);">
+      <pre style="background-color: rgb(204, 255, 255);"><br><br><br><br><br><br><br><br><br><br>Test ran for 31.745109 seconds.<br>Averaging 10 samples<br>Average CPU time is&nbsp; 96.9%.<br>Sending back IPBENCH_DATA_RETURN<br>Sent data (13 bytes)<br>Waiting for OK response</pre>
+      <pre><br>OK Received</pre>
+      <pre><br></pre>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="3" rowspan="1" style="vertical-align: top;"><span
+ style="font-weight: bold; color: rgb(255, 0, 0);">5. Output final
+results<br>
+      </span></td>
+    </tr>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(204, 204, 255);">
+      <pre>Request Throughput,Achieved Throughput,Sent Throughput<br>  Size,Min,Avg,Max,Std.Dev,Median<br>6000000000,2331393232,2331393232,<br>  16384,139,168,136239,941.76,145,96.9</pre>
+      </td>
+      <td
+ style="vertical-align: top; background-color: rgb(255, 204, 153);"><br>
+      </td>
+      <td
+ style="vertical-align: top; background-color: rgb(204, 255, 255);"><br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h2><br>
+</h2>
+<br>
+<br>
+</body>
+</html>

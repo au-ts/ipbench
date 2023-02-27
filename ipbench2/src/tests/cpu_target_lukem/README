@@ -1,0 +1,34 @@
+CPU Target Test
+===============
+
+This test measures the CPU usage on a target machine.  The underlying
+mechanism for determining CPU usage was designed by Luke Mcpherson
+
+YOU NEED TO CALIBRATE THIS TEST
+
+You should have an application built in this directory called
+"calibrate".  Run this on a quiet system, and pipe the output to
+histogram.sh, also included; e.g.
+
+ianw@lime:~/cpu_target_lukem$ ./calibrate | ./histogram.sh
+46.0    999696  100.0%  *******************************************************
+47.0    197       0.0%  *
+56.0    1         0.0%  *
+1387.0  1         0.0%  *
+1409.0  1         0.0%  *
+1696.0  1         0.0%  *
+1707.0  1         0.0%  *
+1729.0  1         0.0%  *
+1734.0  1         0.0%  *
+1737.0  1         0.0%  *
+... and so on ...
+
+Look for the number with the most samples beside it and the largest
+gap from the small inital numbers (in this case 46 and the gap is
+between 56-1387).  You should then set PROFILE_CONTEXT_COST in
+cpu_target_lukem.h to be greater than the smallest number but less
+than anything around that gap.  I choose around 300 for a 900Mhz
+Itanium 2.  This should generally be a good value; but you should
+confirm this to get reliable results.
+
+-i

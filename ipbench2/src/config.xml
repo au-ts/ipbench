@@ -1,0 +1,59 @@
+<!-- ipbench configuration XML file.  General notes
+     * if you receive errors from ipbench about XML parsing you've done something
+       wrong in here.
+     * More specific options override more generic options.  The most generic options
+       come from the command line; then your parent tags and finally the most 
+       specific options are inside your tags.
+-->
+
+<!-- Your config file needs to be in ipbench tags.  There may only be one of these -->
+<ipbench>
+
+ <!-- 
+      Then you can have *one* test section, that describes the test to run. 
+      The valid attributes are
+      * name (required) : name of test to run
+      * args : default arguments for clients
+      * port : default port for clients
+      * target : default target for clients
+ -->
+ <test name="latency" args="default args" port="1234" target="default_target">
+
+  <!-- 
+       Each client can specify a number of arguments; these will
+       override defaults passed from the command line or from the
+       parent <test> tag.  The arguments are
+
+       * hostname (required) : the hostname of the machine ipbenchd is running on
+       * port : the port the ipbenchd daemon is listening on (if not default)
+       * test_target : the hostname the test should target
+       * test_port : the port the test should run on
+       * test_args : any arguments to be passed to this client
+  -->
+  <client hostname="localhost" port="123" test_target="target1"/>
+  <client hostname="client2" test_target="target2" test_port="1234" test_args="asdf"/>
+  <client hostname="client3" test_target="target3" test_port="1234"/>
+ </test>
+
+ <!-- 
+      You can then have target_test sections, if you have something that
+      needs to run on the target machine.  Theoretically, you could
+      setup a few tests to run on the target by having multiple target_test sections and
+      separate daemons on different ports, it might get a bit hairy though!  
+      Equally you can comment out the entire section if you don't want to run a 
+      test on the target. The only valid attribute is the test name. 
+  -->
+ <target_test name="cpu_target">
+  
+  <!-- 
+       as above, have your target machines to run this test listed here.  
+       The valid attributes are 
+       * hostname  : the hostname of the machine the ipbenchd target daemon is 
+                     running on
+       * port      : the port ipbenchd is listening on
+       * test_args : arguments to be passed 
+  -->
+  <target hostname="target" test_args="asdf"/>
+ </target_test>
+</ipbench>
+

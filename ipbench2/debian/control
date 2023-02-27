@@ -1,0 +1,80 @@
+Source: ipbench
+Section: net
+Priority: optional
+Maintainer: peter.chubb@unsw.edu.au
+Standards-Version: 4.0.0
+Build-Depends:  debhelper-compat (= 13), swig (>= 4.0.0), python3-dev
+
+Package: ipbench-client
+Architecture: any
+Depends: ${shlibs:Depends}, ipbench-plugins, python3, ipbench-daemon
+Description: Client machine files for ipbench2
+ ipbench is a distributed networking suite with a variety of tests and
+ a easily extended API for writing new ones.  More information can be
+ found at http://ipbench.sf.net
+ This package contains the daemon which must be running on
+ each of your client machines
+
+Package: ipbench-target
+Architecture: any
+Depends: ${shlibs:Depends}, ipbench-plugins, python3, ipbench-daemon
+Description: Target machine files for ipbench2
+ ipbench is a distributed networking suite with a variety of tests and
+ a easily extended API for writing new ones.  More information can be
+ found at http://ipbench.sf.net
+ This optional package contains a daemon which must be running on your
+ target machine if you wish to run any tests on it during the
+ benchmarking.
+
+Package: libipbench1
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: Client machine files for ipbench2
+ ipbench is a distributed networking suite with a variety of tests and
+ a easily extended API for writing new ones.  More information can be
+ found at http://ipbench.sf.net
+ This package contains the daemon which must be running on
+ each of your client machines
+
+Package: ipbench-plugins
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: Test plugins for ipbench2
+ ipbench is a distributed networking suite with a variety of tests and
+ a easily extended API for writing new ones.  More information can be
+ found at http://ipbench.sf.net
+ This package contains the test plugins for ipbench2 and must be
+ installed.
+
+Package: ipbench-dev
+Architecture: all
+Description: Development files for ipbench2
+ ipbench is a distributed networking suite with a variety of tests and
+ a easily extended API for writing new ones.  More information can be
+ found at http://ipbench.sf.net
+ This package includes headers required to build ipbench plugins.
+
+Package: ipbench-docs
+Architecture: all
+Description: Documentation for ipbench2
+ ipbench is a distributed networking suite with a variety of tests and
+ a easily extended API for writing new ones.  More information can be
+ found at http://ipbench.sf.net
+
+Package: ipbench-controller
+Architecture: all
+Depends: ${shlibs:Depends}, python3, ipbench-client, ipbench-target, python3-lxml
+Description: Controller script for ipbench2
+ ipbench is a distributed networking suite with a variety of tests and
+ a easily extended API for writing new ones.  More information can be
+ found at http://ipbench.sf.net,
+ This package contains the control script.
+
+Package: ipbench-daemon
+Architecture: all
+Depends: python3
+Description: Daemon for ipbench2
+ ipbench is a distributed networking suite with a variety of tests and
+ a easily extended API for writing new ones.  More information can be
+ found at http://ipbench.sf.net,
+ This package contains the daemon for generating network traffic.

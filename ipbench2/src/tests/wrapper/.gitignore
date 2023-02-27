@@ -1,0 +1,10 @@
+.libs
+Makefile
+Makefile.in
+client_wrapper.lo
+client_wrapper_plugin.lo
+common.lo
+libwrapper_client.la
+libwrapper_target.la
+target_wrapper.lo
+target_wrapper_plugin.lo

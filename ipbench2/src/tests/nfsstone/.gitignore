@@ -1,0 +1,6 @@
+.libs
+Makefile
+Makefile.in
+libnfsstones.la
+nfsstones.lo
+plugin.lo

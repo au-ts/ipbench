@@ -1,0 +1,47 @@
+Simple wrapper test
+===================
+
+This test provides a simple wrapper around some sort of shell script
+or other process.
+
+There are three arguments
+
+start
+stop
+output
+
+start is called when the test starts.  Semantics are different based
+on if it is running in the client or the target
+
+ - In the client the start script should run whatever test it requires
+   and return.
+
+ - In the target, the start script should start whatever it needs to
+   do in the background and exit, and be prepared to stop when the
+   stop script is called.  You can organise this via signals and a pid
+   file, some shared variable or any other scheme.  This is because the
+   target is asynchronous and needs to run until some arbitrary time that
+   all clients have checked in.  Of course, if all you need to do is a
+   discrete process that will exit straight away, just run it and exit,
+   and ipbench will handle the polling for you.
+
+Therefore stop follows the same idea;
+
+ - In the client, stop is called after the test completes.  It is
+   probably of limited use as the last item in a start script is
+   equivalent to the first item of a stop script.  Feel free to leave
+   it out.
+
+ - In the target, stop is called to actually stop the test running.
+   It must signal to the running test somehow to stop.
+
+output is called last; the stdout of the process will be captured and
+returned to the controller and printed.
+
+Argument should be specified spearated by commas, with quotes
+surrounding any arguments
+
+Example arguments:
+
+start=/bin/ls,stop="/bin/ls",output="/bin/ls -l"
+

@@ -1,0 +1,53 @@
+2004-04-06  Ian Wienand  <ianw@gelato.unsw.edu.au>
+
+	* too-many : convert all tests into "plug-ins"
+
+2004-03-24  Ian Wienand  <ianw@gelato.unsw.edu.au>
+
+	* configure.in : modify to detect linux/raw sockets; detect versions
+	* autogen.sh : import a better version
+	* src/tests/latency/raw.c : dummy functions for when raw packet
+	support not available
+	* src/tests/latency/latency.c : only link in raw packet support
+	when available
+	* src/tests/ipbench.h : modify includes for bsd, move linux
+	specific raw includes to ...
+	* src/tests/latency/latency.h : ifdef out linux specific raw
+	includes if na; only use __bswap64 if available
+	* src/ipbenchtd.c : use SA_RESETHAND rather than SA_ONESHOT
+	
+2004-03-17  Ian Wienand  <ianw@gelato.unsw.edu.au>
+
+	* src/tests/latency/latency.c : remove debugging status update
+	during test, reflow to all be linux tabbed style code, misc
+	debugging/commenting cleanups
+	* docs/manual/manual.sgml : update slightly (long way to go)
+
+2004-03-16  Ian Wienand  <ianw@gelato.unsw.edu.au>
+
+	* src/ipbench.c : was incorrectly unmarshalling target data as
+	client data
+	* src/tests/latency/latency.c : fix ups for variable sample handling.
+	* src/tests/latency/latency.h : add a better htonll/ntohll 
+	* src/comms.c : fix up commenting out of verbose message logging
+	
+2004-01-27  Ian Wienand  <ianw@gelato.unsw.edu.au>
+
+	* src/util.c : add utility functions here
+	* src/util.h : as above
+	* src/Makefile.am : take account of utility files
+	* src/ipbench.h : include util.h
+	* src/latency.c : convert to use option parsing and 
+	socket option setting from util.c (converted from dbench 
+	by Andrew Tridgell)
+	
+2004-01-19  Ian Wienand  <ianw@gelato.unsw.edu.au>
+
+	* src/ipbenchd.c: use dameon() call
+	* src/ipbenchtd.c: as above
+
+2003-12-17  Ian Wienand  <ianw@gelato.unsw.edu.au>
+
+	* general: Release v0.3
+	* website: Put together http://ipbench.sourceforge.net
+

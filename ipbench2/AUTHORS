@@ -1,0 +1,18 @@
+AUTHORS
+-------
+
+Ian Wienand 
+ - ipbench structure, integration of latency test, cpu usage test, tbench
+
+Luke Macpherson 
+ - latency test
+ - latency nfs test
+
+Charles Gray 
+ - orignal libnfs code for latency nfs test
+
+Peter Chubb <peter.chubb@data61.csiro.au>
+ - discard test, changes to latency test
+
+Darren Williams
+ - nfsstone test

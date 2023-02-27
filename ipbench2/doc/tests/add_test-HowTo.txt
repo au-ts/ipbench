@@ -1,0 +1,22 @@
+This HowTo is a simple guide describing modifications required to the build and 
+configuration system when adding a test to ipbench, it does not define an
+actual example, examples can be taken from tests that have already been
+implemented in the ipbench framework, see: src/tests/dummy.
+
+After creating a seperate directory for your test under /src/tests, you will
+need to update some automake, autoconf files.
+
+ipbench2/configure.in
+    AC_OUTPUT
+        Add the Makefile target that autoconf will generate after automake has
+	been run. This means you will create a Makefile.am file to build the
+	test.
+
+ipbench2/src/tests/Makefile.am
+    SUBDIRS
+        Append your test directory to the SUBDIR target.
+
+ipbench2/src/tests/<testname>/Makefile.am
+    lib<test>_la_SOURCES
+       All files that are used for the generation of the test must be included
+       in this variable, or make dist will not generate a complete source tree.

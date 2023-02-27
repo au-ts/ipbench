@@ -1,0 +1,17 @@
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache
+compile
+config.guess
+config.guess.cdbs-orig
+config.log
+config.status
+config.sub
+config.sub.cdbs-orig
+configure
+depcomp
+install-sh
+libtool
+ltmain.sh
+missing

@@ -1,0 +1,535 @@
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook V4.1//EN' [
+<!ENTITY ipbench '<literal>ipbench</literal>'>
+]>
+
+<book>
+  <bookinfo>
+    <title>&ipbench;</title>
+      
+    <author>
+      <firstname>Ian</firstname>
+      <surname>Wienand</surname>
+      <affiliation>
+        <address><email>ianw@gelato.unsw.edu.au</email></address>
+      </affiliation>
+    </author>
+   
+    <copyright>
+      <year>2004, 2010</year>
+      <holder role='mailto:ianw@gelato.unsw.edu.au'>Ian Wienand</holder>
+    </copyright>
+    
+    <pubdate role='rcs'>$Date$</pubdate>
+  
+    <abstract>
+      <para>The &ipbench; distributed testing suite</para>
+    </abstract>
+  </bookinfo>
+  
+  <part><title>About the suite</title>
+    <chapter><title>About the suite</title>
+      <sect1><title>The general concept</title>
+	<para></para>
+      </sect1> 
+    </chapter>
+  </part>
+    
+  <part><title>The Tests</title>
+    <chapter><title>Running tests</title>
+    <sect1>
+	<title>Test setup</title> <para>To run an &ipbench; test you
+	need several components working together.
+	Firstly, the <emphasis>controller</emphasis> machine is that
+	machine that you are assumed to be sitting at, wanting a set
+	of benchmarking results.  You will farm your work out to
+	a/some/many <emphasis>client</emphasis> machines that will
+	generate load for a specific <emphasis>target</emphasis>.
+	Possibly, you at the controller require some information from
+	the target, for example, how much CPU time it used, so may
+	need to communicate with the target.</para>
+
+	<para>In the above situation, each of the client machines will
+	be running an instance of <literal>ipbenchd</literal>.  Your
+	target machine may also be running an instance of
+	<literal>ipbenchd</literal> (in <emphasis>target</emphasis>
+	mode) 
+	and you will control the test via
+	the <literal>ipbench</literal> program on your local
+	machine. </para>
+
+	<para>A sample command line is going to look something like
+	this <command>ipbench --client="client1.hostname"
+	--client="client2.hostname" --test="latency"
+	--test-args="10Mbps,size=1024,warmup=10,cooldown=10,socktype=UDP"
+	--test-target "benchmark.me.hostname"</command></para>
+
+	<para>The options should be fairly self explanatory.  Each
+	test has a number of arguments it can be passed via its
+	<command>--test-args</command> flag; see the test specific
+	information below for listings and explanations.  If you
+	wished to get information from the target daemon, you would
+	add a <command>--target</command> flag specifying host name
+	(arguments can be passed with
+	<command>--target-args</command>).</para>
+
+	<para>One possible gotcha is that the
+	<command>--target</command> argument should take the name or IP address
+	of the target on the test network, which ideally should be
+	isolated from other networks.  Some of the benchmark tests can
+	generate enough ethernet traffic to saturate multi-gigabit
+	links, so it is important that this not be allowed onto your
+	main network.</para>
+      </sect1>
+
+    <chapter id="latency"><title>Latency</title>
+
+      <sect1 id="about"><title>About</title>
+	<para>The latency test allows you to measure the latency
+	between a number of distributed clients and a target device.</para>
+      </sect1>
+
+      <sect1 id="running"><title>Running the test</title>
+	<sect2><title>Client Machine</title> <para>The client machine
+	need only be running the client daemon
+	<literal>ipbenchd</literal>.  The target machine needs to be
+	able to echo back the packets it receives; there are sample
+	echo programs in <literal>doc/programs</literal> for TCP, UDP
+	and RAW packet types.  However, it should be quite trivial to
+	write your own echo server.</para>
+	</sect2>
+
+	<sect2><title>Controller</title>
+	  
+	  <sect3>
+	    <title>Running the test</title> 
+
+	    <para> There are a number of options that can be passed to
+	  the test.  The options should be passed with the
+	  <userinput>--test-args</userinput> 
+	  command line parameter in a simple
+	  <userinput>"command=value,command1=value1"</userinput>
+	  format (note no white-space). 
+	  The test options are </para>
+
+	    <table frame='all'><title>Latency Test Options</title>
+	      <tgroup cols='5' align='left' colsep='1' rowsep='1'>
+		<thead>
+		  <row>
+		    <entry>Argument</entry>
+		    <entry>Description</entry>
+		    <entry>Example</entry>
+		    <entry>Default</entry>
+		    <entry>Notes</entry>
+		  </row>		 
+		</thead>
+		<tbody>
+		  <row>
+		    <entry><userinput>bps|Mbps</userinput></entry>
+		    <entry>Throughput to attempt in bits per second or
+		    millions of bits per second <emphasis>for each client</emphasis>
+		    (i.e. total to attempt is this argument * number
+		    of clients)</entry>
+		    <entry>The two
+		    arguments<userinput>bps=100000000</userinput> and
+		    <userinput>Mbps=100</userinput> are the same</entry>
+		    <entry><literal>10Mbps</literal></entry>
+		  </row>
+
+		  <!-- sockopts -->
+		  <row>
+		    <entry><userinput>sockopts</userinput></entry>
+		    <entry><para>Set socket options on the client.
+		    You can currently set most standard socket options
+		    with this command.  See the <command>socket
+		    (7)</command> man page for more details about
+		    these options. </para><para><itemizedlist>
+			  <listitem><para><userinput>SO_KEEPALIVE</userinput></para></listitem>
+		    <listitem><para><userinput>SO_REUSEADDR</userinput></para></listitem>
+		    <listitem><para><userinput>SO_BROADCAST</userinput></para></listitem>
+		    <listitem><para><userinput>SO_LOWDELAY</userinput></para></listitem>
+		    <listitem><para><userinput>SO_THROUGHPUT</userinput></para></listitem>
+		    <listitem><para><userinput>SO_SNDBUF=number</userinput></para></listitem>
+		    <listitem><para><userinput>SO_RCVBUF=number</userinput></para></listitem>
+		    <listitem><para><userinput>SO_RCVLOWAT=number</userinput></para></listitem>
+		    <listitem><para><userinput>SO_SNDLOWAT=number</userinput></para></listitem>
+		    <listitem><para><userinput>SO_SNDTIMEO=number</userinput></para></listitem>
+		    <listitem><para><userinput>SO_RCVTIMEO=number</userinput></para></listitem>
+		    </itemizedlist></para></entry>
+		    <entry><para><userinput>sockopts=SO_NODELAY;SO_RCVBUF=16384</userinput></para></entry>
+		    <entry><para><literal>N/A</literal></para></entry>
+		  </row>
+
+		  <!-- warmup -->
+		  <row>
+		    <entry><para><userinput>warmup</userinput></para></entry>
+		    <entry><para>Warmup time in
+		    seconds.</para></entry>
+		    <entry><para><userinput>warmup=20</userinput></para></entry>
+		    <entry><para><literal>5</literal></para></entry>
+		    <entry morerows='1' valign='middle'><para>If you
+		    are using the companion test, make sure you pass
+		    the same warmup and cooldown times with the
+		    <userinput>--target-args</userinput> command so
+		    the target knows what results to
+		    ignore.</para></entry>
+		  </row>
+
+		  <!-- cooldown -->
+		  <row>
+		    <entry><para><userinput>cooldown</userinput></para></entry>
+		    <entry><para>Cooldown time in
+		    seconds.</para></entry>
+		    <entry><para><userinput>cooldown=20</userinput></para></entry>
+		    <entry><para><literal>5</literal></para></entry>
+		  </row>
+
+		  <!-- socktype -->
+		  <row>
+		    <entry><para><userinput>socktype</userinput></para></entry>
+		    <entry><para>Socket type (UDP, TCP or
+		    RAW)</para></entry>
+		    <entry><para><userinput>socktype=udp</userinput></para></entry>
+		    <entry><para><literal>tcp</literal></para></entry>
+		    <entry><para>If you specify the
+		    <literal>socktype</literal> as
+		    <literal>raw</literal> then you must pass the
+		    <literal>ipbench</literal> the
+		    <literal>--target</literal> command as a
+		    <emphasis>MAC address</emphasis>.</para></entry>
+		  </row>
+
+		  <!-- cooldown -->
+		  <row>
+		    <entry><para><userinput>drop</userinput></para></entry>
+		    <entry><para>Time before a UDP packet is considered dropped.</para></entry>
+		    <entry><para><userinput>drop=5</userinput></para></entry>
+		    <entry><para><literal>2</literal></para></entry>
+		  </row>
+
+		  <!-- iface -->
+		  <row>
+		    <entry><para><userinput>iface</userinput></para></entry>
+		    <entry><para>(RAW only).  Interface to use for sending raw packets</para></entry>
+		    <entry><para><userinput>iface=eth1</userinput></para></entry>
+		    <entry><para><literal>eth0</literal></para></entry>
+		  </row>
+
+		</tbody>		
+	      </tgroup>
+	    </table>
+	  </sect3>
+	  
+	  <sect3><title>Test output</title> <para>The output of the
+	    test is presented in a simple comma separated list</para>
+	    <para><computeroutput>Achieved Throughput,Requested
+	    Throughput,Sent Throughput,Min,Avg,Max,Standard
+	    Deviation,Median</computeroutput></para>
+
+	    <table frame='all'>
+	      <title>Latency Test Output</title>
+	      <tgroup cols="4" colsep='1' rowsep='1'>
+		<thead>
+		  <row>
+		    <entry>Measure</entry>
+		    <entry>Description</entry>
+		    <entry>Units</entry>
+		    <entry>Notes</entry>
+		  </row>
+		</thead>
+		<tbody>
+		  <row>
+		    <entry><para><computeroutput>Achieved Throughput</computeroutput></para></entry>
+		    <entry><para>(The number of packets received * the packet size) / (test time)</para></entry>
+		    <entry><para><literal>bits per second</literal></para></entry>
+		    <entry><para>Each client works out its achieved throughput, the total shown is the sum of each clients individual throughput</para></entry>
+		  </row>
+		  <row>
+		    <entry><para><computeroutput>Requested Throughput</computeroutput></para></entry>
+		    <entry><para>The throughput requested with the bps argument</para></entry>
+		    <entry><para><literal>bits per second</literal></para></entry>
+		  </row>
+		  <row>
+		    <entry><para><computeroutput>Sent Throughput</computeroutput></para></entry>
+		    <entry><para>(The number of packets sent * the packet size) / (test time)</para></entry>
+		    <entry><para><literal>bits per second</literal></para></entry>
+		    <entry><para>This should not differ from achieved throughput  unless many packets are sent but not received (i.e.,. dropped)</para></entry>
+		  </row>
+		  <row>
+		    <entry><para><computeroutput>Min</computeroutput></para></entry>
+		    <entry><para>Minimum latency</para></entry>
+		    <entry><para><literal>microseconds</literal></para></entry>
+		    <entry morerows='4'><para>Each client returns all of its data to the controller where these figures are calculated.</para></entry>
+		  </row>
+		  <row>
+		    <entry><para><computeroutput>Avg</computeroutput></para></entry>
+		    <entry><para>Average latency</para></entry>
+		    <entry><para><literal>microseconds</literal></para></entry>
+		  </row>
+		  <row>
+		    <entry><para><computeroutput>Max</computeroutput></para></entry>
+		    <entry><para>Maximum latency</para></entry>
+		    <entry><para><literal>microseconds</literal></para></entry>
+		  </row>
+		  <row>
+		    <entry><para><computeroutput>Standard Deviation</computeroutput></para></entry>
+		    <entry><para>Standard deviation of results</para></entry>
+		    <entry><para><literal>microseconds</literal></para></entry>
+		  <row>
+		    <entry><para><computeroutput>Median</computeroutput></para></entry>
+		    <entry><para>Median latency</para></entry>
+		    <entry><para><literal>microseconds</literal></para></entry>
+		  </row>
+		</tbody>
+	      </tgroup>
+	    </table>
+	  </sect3>
+	  
+	</sect2>
+            </sect1>
+
+    </chapter>
+
+    <chapter id="tbench"><title>Tbench</title>
+
+      <sect1 id="tbench-about"><title>About</title> <para>The Tbench
+	test is an implementation of Andrew Tridgell's Tbench test.
+	The test simulates a heavy load on a Samba server; but instead
+	of the target machine going to the disk it simply echos the
+	replies.  This provides a view of the bandwidth available over
+	the link</para>
+      </sect1>
+
+      <sect1 id="tbench-running"><title>Running the test</title>
+	<sect2><title>Client Machine</title> <para>The client machine
+	need only be running the client daemon
+	<literal>ipbenchd</literal>.  The target machine has some work
+	to do with this test, so will need to be running the
+	<command>ipbenchd</command> daemon.</para>
+	</sect2>
+
+	<sect2><title>Controller</title>
+	  
+	  <sect3>
+	    <title>Running the test</title> 
+
+	    <para> There are a number of options that can be passed to
+	  the test.  The options should be passed with the <userinput>--test-args</userinput>
+	  command line parameter in a simple
+	  <userinput>"command=value,command1=value1"</userinput> format (note no white-space).
+	  The test options are </para>
+
+	    <table frame='all'><title>Tbench Test Options</title>
+	      <tgroup cols='5' align='left' colsep='1' rowsep='1'>
+		<thead>
+		  <row>
+		    <entry>Argument</entry>
+		    <entry>Description</entry>
+		    <entry>Example</entry>
+		    <entry>Default</entry>
+		    <entry>Notes</entry>
+		  </row>		 
+		</thead>
+		<tbody>
+		  <!-- template -->
+		  <row>
+		    <entry><userinput>template</userinput></entry>
+		    <entry><para>template</para></entry>
+		    <entry><para><userinput>template</userinput></para></entry>
+		    <entry><para><literal>template</literal></para></entry>
+		  </row>
+
+		</tbody>		
+	      </tgroup>
+	    </table>
+	  </sect3>
+	  
+	  <sect3><title>Test output</title> <para>The output of the
+	    test is presented in Mbps of achieved throughput.
+	  </sect3>
+	  
+	</sect2>
+      </sect1>
+
+    </chapter>
+    <chapter id="nfslatency"><title>NFS Latency</title>
+      <sect1 id="nfslatency-about"><title>About</title>
+	<para>The NFS Latency test is way to measure NFS performance.
+	It is not a full NFS performance suite, but allows measurement
+	of reads per second from an NFS server.</para>
+      </sect1>
+      <sect1 id="nfslatency-running"><title>Running the NFS Latency
+test</title>
+	<sect2><title>Setting up the server and clients</title>
+	  <para>
+	    To run this test the target must export a filesystem (or
+	    part of one) to all the clients.  If you don't want to run
+            <command>ipbenchd</command> as root on the clients, you
+	    will need to give the <command>insecure</command> option
+	    to <command>exportfs</command>.
+	  </para>
+	  <para>
+	    Assuming that your test network is 192.168.0.0/24, your
+	    <command>/etc/exports</command> file could comtain:
+	    <literal>
+		/tmp	192.168.0.0/24(insecure,async,rw)
+	    </literal>
+	  </para>
+	  <para>
+	  Create a file in the exported directory somewhere:
+	  <userinput>
+		> /tmp/nfstestfile
+		chmod a=rw /tmp/nfstestfile
+	  </userinput>
+	  </para>
+	  <para>You should check that the clients can mount and
+	  unmount the directory, as <literal>ipbench</literal> does
+	  not always give useful error messages.
+	  </para>
+	</sect2>
+	<sect2><title>Running the test</title>
+	  <para>
+		You need to know the name or IP address of the target
+		on the test network, the name of the exported
+		directory, and the name of the file on that directory.
+	</para>
+	  <para>
+	  The test options are </para>
+
+	    <table frame='all'><title>nfs_latency Test Options</title>
+	      <tgroup cols='5' align='left' colsep='1' rowsep='1'>
+		<thead>
+		  <row>
+		    <entry>Argument</entry>
+		    <entry>Description</entry>
+		    <entry>Example</entry>
+		    <entry>Default</entry>
+		    <entry>Notes</entry>
+		  </row>		 
+		</thead>
+	      <tbody>
+		<row>
+		  <entry><userinput>path</userinput></entry>
+		  <entry><para>Name of exported directory, as in
+			<literal>/etc/exports</literal> on the
+			target</para></entry> 
+		  <entry><para><userinput>path=/tmp</userinput></para></entry>
+		  <entry><para><userinput>/tmp</userinput></para></entry>
+		  <entry></entry>
+		</row>
+		<row>
+		  <entry><userinput>filename</userinput></entry>
+		  <entry><para>Name of a file relative to
+<literal>path</literal></para></entry>
+		  <entry><userinput>filename=foo/bah</userinput></entry>
+		  <entry><userinput>file.bench</userinput></entry>
+		  <entry><para>In early versions of
+<literal>ipbench</literal> the filename could not contain slashes.</para></entry>
+		</row>
+		<row>
+		  <entry><userinput>rate</userinput></entry>
+		  <entry><para>Requested operations per
+second.</para></entry>
+		  <entry><userinput>rate=1000</userinput></entry>
+		  <entry>10000</entry>
+		  <entry></entry>
+		</row>
+	      </tbody>
+	    </tgroup>
+	  </table>
+	</sect2>
+	<sect2><title>Example</title>
+	  <para>
+	<userinput>
+	ipbench --client=tinny3 --client=tinny4 \
+--test-args=path=/,filename=tmp/bench.file --test=nfs_latency
+--test-target=192.168.0.5
+</userinput>
+<literal>
+#Achieved request rate,Achieved reply rate,Min latency,Average latency,Median latency,Max latency,Samples,Min runtime,Average runtime,Median runtime,Max runtime
+19999,6212,414,640020,664212,706549,400000,63175592,64383842,65592092,65592092
+</literal>
+
+Output is a comma-separated set of fields, with times in microseconds.
+<table frame='all'><title>nfs_latency output fields</title>
+	      <tgroup cols='3' align='left' colsep='1' rowsep='1'>
+		<thead>
+		  <row>
+		    <entry>Field</entry>
+		    <entry>Units</entry>
+		    <entry>Description</entry>
+		  </row>
+		</thead>
+		<tbody>
+		  <row>
+		    <entry>Achieved rate</entry>
+		    <entry>operations per second</entry>
+		    <entry><para>Achieved rate aggregated across all
+the clients.  This may differ from the requested rate if too high a
+rate is requested, and the clients can't keep up.</para></entry>
+		  </row>
+		  <row><entry>Reply rate</entry>
+		    <entry>operations/sec</entry>
+		    <entry>Read replies per second from the target</entry>
+		  </row>
+		  <row>
+		    <entry>Minimum Latency</entry>
+		    <entry>microseconds</entry>
+		    <entry><para>the fastest time for a reply from an RPC
+			read request.</para></entry>
+		  </row>
+		  <row>
+		    <entry>Mean Latency</entry>
+		    <entry>microseconds </entry>
+		    <entry></entry>
+		  </row>
+		  <row>
+		    <entry>Median Latency</entry>
+		    <entry>microseconds </entry>
+		    <entry></entry>
+		  </row>
+		  <row>
+		    <entry>maximum latency Latency</entry>
+		    <entry>microseconds </entry>
+		    <entry></entry>
+		  </row>
+		  <row>
+		    <entry>samples</entry>
+		    <entry>read rpcs</entry>
+		    <entry><para> the number of replies sampled to
+generate the latency averages</para></entry>
+		  </row>
+		  <row>
+		    <entry>Min Runtime</entry>
+		    <entry>microseconds</entry>
+		    <entry>The minimum time taken to perform 20000
+read/writes, across all clients</entry>
+		  </row>
+		  <row><entry>mean runtime</entry>
+		    <entry>
+		    <entry>microseconds</entry>
+		    <entry>The average time taken to perform 20000
+read/writes, across all clients</entry>
+		  </row>
+		  <row><entry>median runtime</entry>
+		    <entry>
+		    <entry>microseconds</entry>
+		    <entry>A different average time taken to perform 20000
+read/writes, across all clients</entry>
+		  </row>
+		  <row><entry>maximum runtime</entry>
+		    <entry>
+		    <entry>microseconds</entry>
+		    <entry>The maximum time taken to perform 20000
+read/writes, across all clients</entry>
+		  </row>
+		</tbody>
+	      </tgroup>
+	    </table>
+<para>
+For sanity, you should check that the runtimes are all very similar,
+and that the achieved request rate is what you asked for.</para>
+	</sect2>
+      </sect1>
+    </chapter>
+  </part>
+</book>

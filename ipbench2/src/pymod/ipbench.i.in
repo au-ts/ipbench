@@ -1,0 +1,103 @@
+/* ipbench.i */
+
+%module ipbench_[type]
+%{
+
+#include "except.h"
+#include "plugin.h"
+extern struct ipbench_plugin *ipbench_plugin;
+
+#define IPBENCH_TEST_[type]
+
+extern int enable_debug(void);
+
+extern int get_default_port(void);
+
+#ifdef IPBENCH_TEST_client
+extern int setup_controller(int, char*);
+#elif  defined IPBENCH_TEST_target
+extern int setup_controller(char*);
+#endif
+
+extern int load_plugin(const char *);
+
+#ifdef IPBENCH_TEST_client
+extern int setup(char *, int, char *);
+#elif  defined IPBENCH_TEST_target
+extern int setup(char *);
+#endif
+
+extern int start(void);
+
+extern int stop(void);
+
+
+extern int marshall(void **marshalled_data, int *marshalled_data_size);
+
+#ifdef IPBENCH_TEST_client
+extern int unmarshall(int, char *data, int len, int);
+#elif defined IPBENCH_TEST_target
+extern int unmarshall(char *data, int len, int);
+#endif
+
+extern int output(void);
+
+%}
+
+%include "exception.i"
+%include "typemaps.i"
+%include "cstring.i"
+
+%exception {
+	$action
+	if (result == -1)
+		SWIG_exception(errcode, errmsg);
+}
+
+#define IPBENCH_TEST_[type]
+
+extern int enable_debug(void);
+
+extern int get_default_port(void);
+
+#ifdef IPBENCH_TEST_client
+extern int setup_controller(int, char*);
+#elif  defined IPBENCH_TEST_target
+extern int setup_controller(char*);
+#endif
+
+extern int load_plugin(const char *);
+
+#ifdef IPBENCH_TEST_client
+extern int setup(char *, int, char *);
+#elif  defined IPBENCH_TEST_target
+extern int setup(char *);
+#endif
+
+extern int start(void);
+
+extern int stop(void);
+
+%typemap(in, numinputs=0) (void **marshalled_data, int *marshalled_data_size) (void *temp0, int temp1) {
+  $1 = &temp0;
+  $2 = &temp1;
+}
+%typemap(argout) (void **marshalled_data, int *marshalled_data_size) {
+  if (*$1) {
+      %append_output(PyBytes_FromStringAndSize(*$1, *$2));
+      ipbench_plugin->marshall_cleanup((char **)$1);
+  }
+}
+extern int marshall(void **marshalled_data, int *marshalled_data_size);
+
+%typemap(in) (char *data, int len) {
+  Py_ssize_t len;
+  PyBytes_AsStringAndSize($input, &$1, &len);
+  $2 = (int)len;
+}
+#ifdef IPBENCH_TEST_client
+extern int unmarshall(int, char *data, int len, int);
+#elif defined IPBENCH_TEST_target
+extern int unmarshall(char *data, int len, int);
+#endif
+extern int output(void);

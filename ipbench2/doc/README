@@ -1,0 +1,242 @@
+README (in lieu of complete documentation)
+------------------------------------------
+
+ipbench is a distributed network testing suite.
+
+There are three components you need to know about
+
+ * the controller
+ * clients
+ * targets
+
+# Controller
+------------
+The controller is your local PC.  You run ipbench.py on this machine
+and it communicates via a fairly simple interface to client machines.
+
+# Clients
+---------
+There are many clients, each of which will perform a test at a
+specified machine and report its results.  These machines run
+ipbenchd.py, which is a daemon which interacts with the controller.
+The results of the test will be sent back to the controller and
+concatenated into one, hopefully interesting, result.
+Every time you run ipbench, you will need to specify at least one
+client, and a test for that client to run.
+
+# Target
+--------
+The target is the machine being tested.  The target can *optionally*
+run ipbenchd.py --target to peform some sort of action whilst the test
+is running.  Usually this would be to measure CPU usage of the target.
+
+
+* Client tests v. Target Tests
+------------------------------
+
+Client tests differ to target tests in really only one respect : a
+client test runs until completion whilst a target test runs until it
+is told to stop.  This reflects the fundamental design choice that a
+target test is something that is being done on the target whilst the
+client test is running.  Under the hood, ipbench.py starts all clients
+running their test, and waits for their responses.  Once it has
+received them, it will then issue the STOP command to any running
+target test.  Thus a target test can not run by its self -- it needs
+to be stopped as a response to a client test completing.
+
+When you specify a client test, you must specify 
+  * one or more client hostnames
+  * the name of the test to run
+  * the target for that test
+
+Optionally, you may specify 
+
+  * the port to communicate to the remote clients invocation of
+    ipbenchd.py (by default 8036)
+  * the port the test should run against (by default, this is taken
+    from the test plugin its self)
+
+You can do this from the command line with arguments to ipbench.py
+
+Thus, the minimal arguments are 
+
+  --client=hostname     : specify each client with its own argument
+  --test=test           : the name of the test to run
+  --test-target=target  : the name of the remote target to run the test against
+  --test-args=args      : any arguments for the test
+
+# Adding a target test
+----------------------
+
+The minimal extra options to run a target test at the same time as a
+client test are
+
+  --target-test=test      : specify the name of the target test
+  --target-test-args=args : specify any arguments to the target test
+
+There are also other options for ports which by default should be correct.
+
+* Using an XML configuration file
+---------------------------------
+
+There is a sample configuration file in example.xml which should be
+self explainitory.
+
+Since XML is a richer representation than command line arguments, it
+affords you some extra options over simply using command line
+arguments.  Note, where an option is not specified in the XML config
+file, it will be taken from the command line arguments; but config
+files will override a command line arguments.
+
+The extra things you can do with an XML config file are
+
+ ] Specify a different test-target for each client.  This is useful if
+   you have, say, a dual port network card and you want to generate load
+   against both ports, with half of your clients sending to one and half
+   to the other.
+
+ ] Specify multiple target tests.  By default, the commandline can
+   only have one target test specified with --target-test, but using a
+   config file you can have many target tests, or run the same target
+   test on many machines.
+
+* ipbenchd.py
+-------------
+
+The only interesting option to ipbenchd.py is the '--target' flag,
+which switches the daemon into target listening mode.  The only
+difference between client and target mode is that in target mode, the
+test must be explicitly told to stop, whereas in client mode, the test
+runs until completion.  This will one day be fixed to automatically
+figure out what mode it should be running in from information in the
+test.
+
+* Underlying protocol
+---------------------
+
+Each ipbenchd instance exports a simple interface inspired by
+SpecWEB99 clients.  You can see this by starting up an ipbenchd daemon
+and using telnet to connect to it's port.  The basic sequence of
+commands is
+
+HELLO            : check version information
+
+LOAD test_name   : load the dynamic library containing test_name
+
+SETUP            : setup has two formats, depending on if it is talking to a client 
+                   or a target.  The client needs to know the target,
+                   the target port and any arguments, so it receives a line like
+                   SETUP target::targetname||port::1234||args::"arguments"
+                   Note "::" and "||" are reserved characters so no test may use them
+                   in their arguments.  Quotes around "arguments" will be stripped
+                   when passed through to the actual test.
+                   A target does not need information on the target, so only receives 
+                   arguments 
+                   SETUP args::"arguments"
+
+START            : The test will start
+                   At this point, clients will run the test and respond with a
+                   positive response and a "content-length:" line, saying how many
+                   bytes of data will follow.  Clients have finished at this point
+
+STOP             : Once all clients have reported their data, STOP will be sent to any
+                   target tests running
+
+Some additional commands are 
+QUIT             : Quit current processing
+STATUS           : Tell if we are currently running a test or not
+ABORT            : Abort a test that is currently running (fragile, as it is not always 
+                   gaurnteed when python can kill a process)
+
+
+
+* Client tests
+--------------
+
+ ] dummy
+    A simple test as an example. 
+
+ ] wait
+    A test that simply waits for the user to press enter or to send it
+    a SIGINT.  Once received, it stops.  This is useful if you only
+    want to use the target CPU measurement, for example.  It takes no arguments
+
+ ] latency
+    A complex test that measures the latency of a network interface.
+    This is more fully documented elsewhere.
+
+ ] nfsstone
+    A version of nfsstone
+
+ ] wrapper
+    A test that can execute shell scripts (or any other system commands)
+
+* Target tests
+--------------
+
+ ] dummy_target 
+    An example test
+
+ ] discard
+    count pakets and throw them away.  Useful with the latency test.
+
+ ] cpu_target
+    Measure the CPU usage of the target machine, using Andrew Morton's
+    cyclesoak algorithm.  The only argument is cpus=n, to fork more
+    cycle soaking children.
+
+ ] cpu_target_lukem
+    An alternative target test which is based on more accurate cycle counting
+
+
+* Quickstart Guide
+------------------
+
+ 1) Build the current cvs sources and install.
+     - use the autogen.sh script in the top level directory
+     - ./configure && make && make install
+
+ 2) Start up three terminal windows, one is the controller, one is a
+    client and the other is a target
+
+ 3) In the client window start ipbenchd.py
+
+    $ python /usr/local/bin/ipbenchd.py --debug
+
+ 4) In the target window, start ipbenchd.py --target
+
+    $ python /usr/local/bin/ipbenchd.py --target --debug
+
+ 5) In the controller, run
+
+    $ python /usr/local/bin/ipbench.py --test=wait --client=localhost \
+             --test-target=localhost --target-test=cpu_target_lukem    \
+	     --target-test-hostname=localhost
+
+ 6) You should see something like
+
+  ] Client 
+
+  ---
+  [run] start
+  [parse_common_opts]: got line START
+  [run] starting actual test 
+  Please press ENTER or send a SIGINT to 4576 to stop the test
+  ---
+  
+  Press Enter in this window to complete the test
+
+
+  ] Target
+  ---
+  [run] start
+  [parse_common_opts]: got line START
+  [run] starting target test
+  [16:32.40] dbg: Starting.
+  ---
+
+  ] Controller (after pressing enter in the client window)
+  --- 
+  OK   <--- reponse from client
+  5.8  <--- respose from target (your CPU usage)
+  ---

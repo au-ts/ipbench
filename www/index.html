@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <meta name="author" content="Ian Wienand">
+  <title>ipbench - a distributed framework for network benchmarking</title>
+</head>
+<body>
+<h1>ipbench - A distributed framework for network benchmarking<br>
+</h1>
+<h2>What is ipbench?</h2>
+ipbench is an extensible and reliable benchmarking suite we created in
+response to some common problems we saw with existing IP benchmark
+software.<br>
+<br>
+<h3>Main goals</h3>
+<ol>
+  <li><span style="font-weight: bold; color: rgb(255, 0, 0);">Distributed
+operation</span> : We want multiple clients able to perform the same
+test a target machine.&nbsp; We want to be able to get the results
+reliably and consistently without resorting to hacking sh and perl
+scripts to munge data around.</li>
+  <li><span style="font-weight: bold; color: rgb(255, 0, 0);">No
+"heavyweight" server</span> : Most existing network benchmark suites
+assume that both ends of the test are complete operating systems, with
+BSD socket support and POSIX compliance.&nbsp; Experimental operating
+systems often don't meet these requirements.</li>
+  <li><span style="font-weight: bold; color: rgb(255, 0, 0);">Extensibility</span><span
+ style="color: rgb(255, 0, 0);"> </span>: We want to be able to add
+new and varied tests easily.</li>
+  <li><span style="font-weight: bold; color: rgb(255, 0, 0);">There
+aren't that many benchmark suites around</span> : many paper authors
+resort to writing their own benchmarks, creating problems with
+repeatability and reliability of results.<br>
+  </li>
+</ol>
+<h3>Architecture</h3>
+<div style="text-align: center;"><img
+ style="width: 504px; height: 268px;" alt="overview of ipbench"
+ src="images/overview.png"><br>
+<div style="text-align: left;">The test suite has three main components<br>
+<ol>
+  <li><span style="color: rgb(51, 51, 153);">A controller</span> : Your
+personal computer</li>
+  <li><span style="font-style: italic; color: rgb(51, 51, 153);">n</span><span
+ style="color: rgb(51, 51, 153);"> testers</span> : A "heavyweight" PC
+on which the test will run</li>
+  <li><span style="color: rgb(51, 51, 153);">A target</span> :
+depending on the test requires different capabilities.</li>
+</ol>
+The general procedure is that you specify the test and the controller
+sets up and sychronously starts the tester machines running their test
+aimed at the target.&nbsp; Once they have completed, they report their
+results back to the controller, which concatenates the results from all
+testers and reports a final tally.<br>
+<br>
+Some tests have a companion component that runs on the target, such as
+a CPU
+usage monitor (the light grey lines above).&nbsp; These are optional
+but work similar to the testing clients.<br>
+</div>
+</div>
+<br>
+<h3>Implementation</h3>
+The infrastructure is written in Python for maintainability, and the
+tests are written as plugins in C for speed.&nbsp; There is a simple
+API for writing new tests should you wish to.<br>
+<h2>Tests</h2>
+<h3>Latency Test</h3>
+We have instrumented a latency test which we belive is one of the most
+flexible latency tests available.<br>
+<br>
+For documentation on the latency test see <a href="./latency.html">this
+page</a><br>
+<br>
+<h3>NFS Test</h3>
+We have a beta stage distributed NFS test included in the distribution.<br>
+<br>
+<h3>CPU Usage</h3>
+We have implemented an accurate CPU usage meter that can be run on the
+target machine.<br>
+<br>
+<h3>Wrapper Test</h3>
+Using simple shell scripts called by ipbench you can very quickly
+extend the operation of ipbench.&nbsp; For example, wrapper scripts
+around <span style="font-family: monospace;">oprofile </span>can
+automatically return kernel profiling information from your target
+machine during a run.<br>
+<br>
+<h2>Getting it</h2>
+Please grab the latest sources from Sourceforge<br>
+<p><tt>
+git clone git://git.code.sf.net/p/ipbench/source ipbench
+</tt></p>
+<p>
+Once you have the sources, run <tt>autogen.sh</tt> and then
+<tt>configure</tt> and <tt>make</tt>. Documentation is lagging a
+little behind development at this stage, but please give it a go and
+email with any questions.
+</p>
+<p>
+Please feel free to submit patches or bugs, but please checkout the
+latest sources.<br>
+You may also check out the <a
+ href="http://sourceforge.net/projects/ipbench/">sourceforge page</a>
+for any releases.<br>
+</p>
+<a href="http://sourceforge.net"><img alt="SourceForge.net Logo"
+ src="http://sourceforge.net/sflogo.php?group_id=95275&amp;type=5"
+ border="0" height="62" width="210"></a><br>
+<div style="text-align: center;">
+<div style="text-align: left;">
+<h2>Example</h2>
+See <a href="samples.html">this page</a> for a sample of a testing run.<br>
+<h2>Authors</h2>
+<a href="mailto:peter.chubb@hamonly.data61.csiro.au">Peter Chubb</a><br>
+<br>
+</div>
+</div>
+<p></p>
+<hr style="width: 100%; height: 2px;">This work sponsored by<br>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="2"
+ cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="text-align: center; vertical-align: middle;">
+	<img
+ style="border: 0px solid ; width: 158px; height: 62px;"
+ alt="gelato.org" src="images/gelato.png"><br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;"><a
+ href="http://www.hp.com"><img
+ style="border: 0px solid ; width: 74px; height: 61px;" alt="hp.com"
+ src="images/hp.png"></a><br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;"><a
+ href="http://www.unsw.edu.au"><img
+ style="border: 0px solid ; width: 116px; height: 52px;" alt="unsw"
+ src="images/unsw.png"></a><br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;"><a
+href="https://ts.data61.csiro.au/">Trustworthy Systems at CSIRO's
+	  Data61</a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+</body>
+</html>

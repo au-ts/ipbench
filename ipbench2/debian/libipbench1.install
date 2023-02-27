@@ -1,0 +1,1 @@
+debian/tmp/usr/lib/${DEB_TARGET_GNU_TYPE}/lib* usr/lib/${DEB_TARGET_GNU_TYPE}

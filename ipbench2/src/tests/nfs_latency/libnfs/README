@@ -1,0 +1,8 @@
+libnfs
+======
+
+A cleanroom NFS implementation first written by Charles Gray and
+ported to UNIX by Luke Macpherson.
+
+The source code in this directoy has been released to the public
+domain.

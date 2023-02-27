@@ -1,0 +1,40 @@
+#!/bin/bash
+
+CLIENTS="tinny0 tinny1 tinny2 tinny3 tinny4 tinny5 tinny6"
+TEST_TARGET="192.168.0.1"
+TARGET="leffe"
+TARGET_PORT="7777"
+#THROUGHPUT_RANGE="142857 3571428 7142857 14285714 28571428 57142857 114285714" 
+#THROUGHPUT_RANGE="103439621 73142857 51719810 36571429 25859905 18285714 12929953 9142857 6464976 4571429 3232488 2285714 1616244 114285"
+THROUGHPUT_RANGE="136489398 127349111 118820922 110863840 103439621 96512579 90049420 84019080 78392573 73142857 68244699 63674555 59410461 55431920 51719810 48256289 45024710 42009540 39196287 36571429 34122349 31837278 29705230 27715960 25859905 24128145 22512355 21004770 19598143 18285714 17061175 15918639 14852615 13857980 12929953 12064072 11256177 10502385 9799072 9142857"
+PACKET_SIZE_RANGE="1420 1024 512 256 128 64"
+WARMUP_TIME=10
+COOLDOWN_TIME=10
+SOCKTYPE="udp"
+OUTPUT_FILE='output.csv'
+
+for client in $CLIENTS
+do
+  CLIENT_ARGS=$CLIENT_ARGS" --client $client"
+done
+
+echo "Requested_Throughput,Receive_Throughput,Send_Throughput,Packet_Size,Minimum_RTT,Average_RTT,Maximum_RTT,Stdev_RTT,Median_RTT,CPU_utilisation" > $OUTPUT_FILE
+
+for throughput in $THROUGHPUT_RANGE
+do
+  for packetsize in $PACKET_SIZE_RANGE
+  do
+    echo Running $throughput Mbps, size $packetsize
+
+    RESULT=`./ipbench $CLIENT_ARGS --test-target="$TEST_TARGET" --test-port="$TARGET_PORT" --test="latency" --test-args="socktype=$SOCKTYPE,bps=$throughput,size=$packetsize,warmup=$WARMUP_TIME,cooldown=$COOLDOWN_TIME" --target="$TARGET" --target-args="cooldown=$COOLDOWN_TIME,warmup=$WARMUP_TIME" | awk -F ',' '{p = (($1-$2)/$1)*100; if (p < -20 || p > 20 ) print "*"$IF ; else print $IF ;}' `
+    
+    if [ "`echo $RESULT | grep '*'`" = "" ] ; then
+	echo $RESULT   >> $OUTPUT_FILE
+    else 
+	echo $RESULT >> $OUTPUT_FILE
+	break;
+    fi
+    
+    echo Done.
+  done
+done

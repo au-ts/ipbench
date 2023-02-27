@@ -1,0 +1,10 @@
+.deps
+.libs
+Makefile
+Makefile.in
+dummy.lo
+dummy_target.lo
+libdummy.la
+libdummy_target.la
+plugin.lo
+target_plugin.lo

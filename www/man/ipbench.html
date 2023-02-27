@@ -1,0 +1,138 @@
+Content-type: text/html
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML><HEAD><TITLE>Man page of ipbench</TITLE>
+</HEAD><BODY>
+<H1>ipbench</H1>
+Section: ipbench (1)<BR>Updated: 17 Dec 2003<BR><A HREF="#index">Index</A>
+<A HREF="/cgi-bin/man/man2html">Return to Main Contents</A><HR>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+<P>
+
+ipbench - Control an ipbench session
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNTAX</H2>
+
+<P>
+
+ipbench <B>--client</B>=<I>client_hostname</I>... [<B>--client-port</B>=<I>port</I>]
+<BR>
+
+<B>--test</B>=<I>testname</I> <B>--test-target</B>=<I>test_target_hostname</I>
+<BR>
+
+[<B>--test-args</B>=<I>args</I>] [<B>--test-port</B>=<I>port</I>] 
+<BR>
+
+<B>[--target</B>=<I>target_hostname</I>] [<B>--target-port</B>=<I>port</I>]
+<BR>
+
+[<B>--target-args</B>=<I>args</I>]
+<BR>
+
+[<B>-v</B>] [<B>-V</B>] [<B>-h</B>|<B>--help</B>]
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<P>
+
+Controls a number of remote testing clients to run a specified test and report their results.
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<P>
+
+<DL COMPACT>
+<DT><B>--client</B>=<I>hostname</I>...<DD>
+Specify a remote client to connect to.  Each client must be running an invocation of <I><A HREF="/cgi-bin/man/man2html?1+ipbenchd">ipbenchd</A></I>(1).  You may specify multiple clients by passing the <B>--client</B> argument many times.
+<DT><B>--client-port</B>=<I>port</I><DD>
+Specify a port to connect to remote client.  This will be global, i.e. all clients will be contacted on this port.
+<DT><B>--test</B>=<I>name</I><DD>
+The test to run.  Use <I>-h</I> to see a list of possible tests.
+<DT><B>--test-args</B>=<I>arguments</I><DD>
+Arguments for the test.  See test specific documentation for possible arguments; by leaving this argument out you will get the test defaults.
+<DT><B>--test-target</B>=<I>hostname</I><DD>
+The target machine that the clients should direct their testing towards.
+<DT><B>--test-port</B>=<I>port</I><DD>
+The port to run the test on.  Each test has an inbuilt port it will use by default.
+<DT><B>--target</B>=<I>target_hostname</I><DD>
+If the test has companion test that is run on the target machine, this flag will activate it.  The target machine must be running <I><A HREF="/cgi-bin/man/man2html?1+ipbenchtd">ipbenchtd</A></I>(1).  See the test documentation for more information about the companion target test.
+<DT><B>--target-args</B>=<I>args</I><DD>
+Arguments for the companion test on the target.
+<DT><B>-v</B><DD>
+Be more verbose.
+<DT><B>-V</B><DD>
+Show version information.
+<DT><B>-h</B> | <B>--help</B><DD>
+Show help information.
+</DL>
+<A NAME="lbAF">&nbsp;</A>
+<H2>FILES</H2>
+
+<P>
+
+(none)
+<A NAME="lbAG">&nbsp;</A>
+<H2>ENVIRONMENT VARIABLES</H2>
+
+<P>
+
+(none)
+<A NAME="lbAH">&nbsp;</A>
+<H2>EXAMPLES</H2>
+
+<P>
+
+The latency test might be run as:
+<P>
+
+ipbench --client=tinny0 --client=tinny1 --client-port=6123
+<BR>
+
+--target=leffe --active-target --target-port=6124 
+<BR>
+
+--target-args=&quot;warmup=10,cooldown=10&quot;
+<BR>
+
+--test=latency --test-port=5555
+<BR>
+
+--test-args=&quot;bps=100000000,size=128,socktype=udp,warmup=10,cooldown=10&quot;
+<A NAME="lbAI">&nbsp;</A>
+<H2>AUTHORS</H2>
+
+<P>
+
+Ian Wienand
+<A NAME="lbAJ">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<P>
+
+<A HREF="/cgi-bin/man/man2html?1+ipbenchd">ipbenchd</A>(1) <A HREF="/cgi-bin/man/man2html?1+ipbenchtd">ipbenchtd</A>(1)
+<P>
+
+<HR>
+<A NAME="index">&nbsp;</A><H2>Index</H2>
+<DL>
+<DT><A HREF="#lbAB">NAME</A><DD>
+<DT><A HREF="#lbAC">SYNTAX</A><DD>
+<DT><A HREF="#lbAD">DESCRIPTION</A><DD>
+<DT><A HREF="#lbAE">OPTIONS</A><DD>
+<DT><A HREF="#lbAF">FILES</A><DD>
+<DT><A HREF="#lbAG">ENVIRONMENT VARIABLES</A><DD>
+<DT><A HREF="#lbAH">EXAMPLES</A><DD>
+<DT><A HREF="#lbAI">AUTHORS</A><DD>
+<DT><A HREF="#lbAJ">SEE ALSO</A><DD>
+</DL>
+<HR>
+This document was created by
+<A HREF="/cgi-bin/man/man2html">man2html</A>,
+using the manual pages.<BR>
+Time: 00:26:59 GMT, December 17, 2003
+</BODY>
+</HTML>
