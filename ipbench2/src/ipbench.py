@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+"""
+ipbench.py
+
+Module encapsulating all controller logic.
+"""
 
 import sys
 import re
@@ -46,14 +51,14 @@ class IpbenchTestClient:
     Class encapsulating logic for controller machine to spin up tests.
     """
 
-    def __init__(self, hostname, port, test_target, test_port, id, test_name, test_ptr, test_args=None):
+    def __init__(self, hostname, port, test_target, test_port, client_id, test_name, test_ptr, test_args=None):
         self.hostname = hostname
         self.port = port
         self.test_port = test_port
         self.test_target = test_target
         self.test_args = test_args
         self.socket = None
-        self.id = id    # Identifier for this client
+        self.client_id = client_id    # Identifier for this client
         self.test_name = test_name
         self.test_ptr = test_ptr
 
@@ -77,14 +82,14 @@ class IpbenchTestClient:
         """
         status = {}
         status["code"] = int(data[0:3])
-        fence_start = data.find("(")
-        if (fence_start == -1):
+        fence1 = data.find("(")
+        if (fence1 == -1):
             status["str"] = data[4:].strip()
             status["msg"] = ""
         else:
-            fence_end = data.find(")")
-            status["str"] = data[4:fence_start].strip()
-            status["msg"] = data[fence_start+1:fence_end].strip()
+            fence2 = data.find(")")
+            status["str"] = data[4:fence1].strip()
+            status["msg"] = data[fence1+1:fence2].strip()
 
         dbprint("[parse_return_code] : "
                 + " code=" + repr(status["code"])
@@ -197,7 +202,7 @@ class IpbenchTestClient:
         """
         Invoke unmarshall feature in test module.
         """
-        self.test_ptr.unmarshall(int(self.id), client_data, valid)
+        self.test_ptr.unmarshall(int(self.client_id), client_data, valid)
 
     def unmarshall(self):
         """
