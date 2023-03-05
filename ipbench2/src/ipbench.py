@@ -230,7 +230,7 @@ def main():
     targets = []
 
     usage = "usage: %prog [options]"
-    parser = OptionParser(usage, version="%prog 2.0")
+    parser = OptionParser(usage, version="%prog 2.1")
     parser.add_option("-d", "--debug", dest="debug", action="store_true",
                       help="Enable Debugging", default=False)
 
