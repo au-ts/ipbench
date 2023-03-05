@@ -1,6 +1,7 @@
 # ipbench
 A benchmark suite for repeatable and reliable testing of IP networks. 
 
+Getting started? See [SETUP.md](SETUP.md)
 ## What is ipbench?
 
 ipbench is an extensible and reliable benchmarking suite we created in response to some common problems we saw with existing IP benchmark software.
