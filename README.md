@@ -56,3 +56,10 @@ Using simple shell scripts called by ipbench you can very quickly extend the ope
 ## Authors
 
 Peter Chubb
+
+## Contributers
+
+Matthew Rossouw (move to GitHub, QoL and 2.1)
+Ian Wienand (legacy)
+Luke Macpherson (legacy, CPU measurement systems)
+
