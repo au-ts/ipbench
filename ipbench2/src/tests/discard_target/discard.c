@@ -1,22 +1,11 @@
-#include "plugin.h"
-
+#include "../latency/latency.h"
 #include "discard.h"
 #include <assert.h>
 #include <fcntl.h>
 #include <net/if.h>
 
-#include "../latency/latency.h"
-#include "../latency/microuptime.h"
 #include "../latency/raw.h"
 
-
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-# define htonll(x) __bswap_64(x)
-# define ntohll(x) __bswap_64(x)
-#else
-# define htonll(x) (x)
-# define ntohll(x) (x)
-#endif
 
 /* Globals and their defaults */
 static int fd;
@@ -29,7 +18,7 @@ static unsigned long long test_time=10;  /* run testfor 10 seconds 	    */
 static char ifname[IFNAMSIZ] = "eth1";
 char sockopts[200];
 
-extern short protocol;
+short protocol;
 
 struct discard_result {
 	uint64_t transmitted_bytes;
@@ -135,6 +124,7 @@ generate_load(int sock)
 		if (predicted_sends > sends) {
 			if (tosend == 0){
 				raw_fill_packet(sbuf, sid);
+                                sid++;
 				tosend = size;
 			}
 
@@ -214,10 +204,8 @@ generate_load(int sock)
 
 int discard_setup(char *hostname, int port, char *arg)
 {
-	int flag, flaglen;
+	int flag;
 	int fd;
-
-	flaglen = sizeof flag;
 
 	dbprintf("discard setup begin (target %s [port %d]).\n", hostname, port);
 
@@ -227,8 +215,8 @@ int discard_setup(char *hostname, int port, char *arg)
 
 	if ((fd = raw_setup_socket(hostname, port, ifname)) < 0)
 		return -1;
-	if (sockopts != NULL)
-		set_socket_options(fd, sockopts);
+        set_socket_options(fd, sockopts);
+        microuptime_calibrate();
 //	fcntl(fd, F_SETFL, O_NONBLOCK);
 	return 0;
 }
@@ -259,7 +247,7 @@ int discard_marshal(void **data, size_t *size, double running_time)
 
 	tosend = malloc(sizeof *tosend);
 	if (tosend == NULL)
-		errprintf(1,"Can't malloc %u bytes", sizeof *tosend);
+		printf("Can't malloc %u bytes", sizeof *tosend);
 
 
 	tosend->size    = htonll(result.size);
@@ -304,7 +292,7 @@ int discard_unmarshal(void *input, size_t input_len, void **data,
 	*data_len = sizeof(struct discard_result);
 	theresult = *data = malloc(*data_len);
 	if (*data == NULL)
-		errprintf(1,"Out of buffer space.\n");
+		printf("Out of buffer space.\n");
 
 	/* convert theresult back to something sensible for us */
 	theresult->microseconds    = ntohll(result->microseconds);
@@ -364,7 +352,7 @@ int discard_output(struct client_data *target_data, struct client_data data[], i
  		 dbprintf("achieved %"PRId64" bps\n", total_sent_throughput);
  	dbprintf("\n");
 #endif
-	printf("%llu,%llu,%llu",
+	printf("%lu,%lu,%lu",
 	       total_requested_throughput, total_sent_throughput, packet_size);
 	if (target_data != NULL) {
 		printf(",%s", (char*)target_data->data);
@@ -373,3 +361,33 @@ int discard_output(struct client_data *target_data, struct client_data data[], i
 
 	return 0;
 }
+
+int discard_setup_controller(char *arg)
+{
+	if (arg) {
+		dbprintf("Setting up controller (%s)\n", arg);
+		/* a bit of a hack ... */
+		if (parse_args(arg))
+			return -1;
+	}
+	return 0;
+}
+
+struct ipbench_plugin ipbench_plugin = 
+{
+	.magic = "IPBENCH_PLUGIN",
+	.name = "discard",
+	.id = 0x05,
+	.descr = "Discard Tests",
+	.default_port = 7,
+	.setup = &discard_setup,
+	.setup_controller = &discard_setup_controller,
+	.start = &discard_start,
+	.stop = &discard_stop,
+	.marshall = &discard_marshal,
+	.marshall_cleanup = &discard_marshal_cleanup,
+	.unmarshall = &discard_unmarshal,
+	.unmarshall_cleanup = &discard_unmarshal_cleanup,
+	.output = &discard_output,
+};
+

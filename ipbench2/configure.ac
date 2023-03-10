@@ -22,7 +22,7 @@ AC_ARG_ENABLE(debug,
   fi)
 
 #These test directories will be built by default
-ipbench_tests="wait latency dummy cpu_target nfsstone wrapper cpu_target_lukem nfs_latency"
+ipbench_tests="wait latency dummy cpu_target nfsstone wrapper cpu_target_lukem nfs_latency discard_target"
 
 AC_ARG_ENABLE([tests],
 [  --enable-tests=TESTS		tests directories to build (comma separated, default is all tests)],
