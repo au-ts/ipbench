@@ -6,6 +6,9 @@
  * This file, and the related ipbench.i swing input file, describe the
  * shunt library that interfaces between test plugins (shared objects)
  * and the python based daemons.
+ * 
+ * Tidied up for 2.1. Added more descriptive error messages, cleaned up style.
+ * Matt Rossouw <matthew.rossouw@unsw.edu.au> 2023
  *
  */
 
@@ -20,16 +23,16 @@
 
 struct ipbench_plugin *ipbench_plugin;
 #ifdef IPBENCH_TEST_CLIENT
-static struct client_data *client_data;
+	static struct client_data *client_data;
 #elif defined(IPBENCH_TEST_TARGET)
-static struct client_data target_data;
+	static struct client_data target_data;
 #else
-# error "IPBENCH_TEST_CLIENT or IPBENCH_TEST_TARGET must be #defined"
+ 	#error "IPBENCH_TEST_CLIENT or IPBENCH_TEST_TARGET must be #defined"
 #endif
 
 #ifdef IPBENCH_TEST_CLIENT
-/* number of clients */
-static int nclients;
+	/* number of clients */
+	static int nclients;
 #endif
 /* number of seconds between start() and stop() timestamping */
 static double run_secs;
@@ -50,7 +53,7 @@ int get_default_port(void)
  * in '.so' */
 static int filter(const struct dirent *d)
 {
-	if ( strcmp(&d->d_name[strlen(d->d_name)-3] , ".so" ))
+	if (strcmp(&d->d_name[strlen(d->d_name)-3], ".so"))
 		return 0;
 	return 1;
 }
@@ -89,7 +92,7 @@ int load_plugin(const char *plugin_name)
         /* recurse through looking for plugins */
         n = scandir(path, &namelist, filter, NULL);
         if (n < 0)
-                perror("scandir");
+                perror("ipbench plugin scandir failed! Check ipbench plugins.");
         else if ( n > MAX_PLUGINS )
 		return -1;
         else {
@@ -135,14 +138,14 @@ int load_plugin(const char *plugin_name)
 			free(namelist[n]);
 			break;
 		out:
-                        free(namelist[n]);
+                    free(namelist[n]);
                 }
                 free(namelist);
         }
 
 	if (ipbench_plugin == NULL)
-		return ipbench_error(ipbench_RuntimeError, "Can not find plugin");
-        return 0;
+		return ipbench_plugin_error(ipbench_RuntimeError, "Can not find plugin", plugin_name);
+	return 0;
 }
 
 int start(void)
@@ -151,7 +154,7 @@ int start(void)
 
 	sts = ipbench_plugin->start(&timer_start);
 	if (sts)
-		return ipbench_error(ipbench_RuntimeError, "start failed");
+		return ipbench_plugin_error(ipbench_RuntimeError, "Plugin failed to start!", ipbench_plugin->name);
 
 	return 0;
 }
@@ -163,7 +166,7 @@ int stop(void)
 
 	sts = ipbench_plugin->stop(&timer_stop);
 	if (sts)
-		return ipbench_error(ipbench_RuntimeError, "stop failed");
+		return ipbench_plugin_error(ipbench_RuntimeError, "Plugin failed to stop!", ipbench_plugin->name);
 
 	timersub(&timer_stop, &timer_start, &timer_diff);
 	run_secs = timer_diff.tv_sec + timer_diff.tv_usec * 1e-6;
@@ -181,7 +184,7 @@ int setup(char *hostname, int port, char *clientargs)
 	ret = ipbench_plugin->setup(hostname, port, clientargs);
 
 	if (ret == -1)
-		return ipbench_error(ipbench_RuntimeError, "Setup failed");
+		return ipbench_plugin_error(ipbench_RuntimeError, "Client setup failed", ipbench_plugin->name);
 	else
 		return 0;
 }
@@ -208,8 +211,8 @@ int setup(char *clientargs)
 	ret = ipbench_plugin->setup(clientargs);
 
 	if (ret == -1)
-		return ipbench_error(ipbench_RuntimeError, "Setup failed");
-        return 0;
+		return ipbench_plugin_error(ipbench_RuntimeError, "Target setup failed", ipbench_plugin->name);
+	return 0;
 }
 #endif
 
@@ -276,5 +279,5 @@ int output(void)
 	sts = ipbench_plugin->output(&target_data);
 #endif
 	return sts;
-
 }
+

@@ -1,0 +1,111 @@
+#!/bin/sh
+#
+
+# Which clients to use?
+TINNIES="`seq -w 01 10`"
+# Address/name of target on the Tinny network
+# for interface under test.
+# For SOCKTYPE==RAW, set to MAC address of card.
+TESTTARGETIP=172.16.1.184 # imx8mm
+#TESTTARGETMAC=00:50:ba:38:d9:d6
+TESTTARGETMAC=${TESTTARGETMAC:-34:17:eb:a5:57:64}
+
+# Address/name of target on the controlnetwork
+# for control.
+TARGET=imx8mm.iot.keg.cse.unsw.edu.au
+TARGET_PORT=1236
+PORT=1235
+#PORT=7
+#
+# Echo test: raw (ethernet protocol 6008)
+# udp or tcp to port 7.
+SOCKTYPE=${SOCKTYPE:-udp}
+#SOCKTYPE=raw
+#SOCKTYPE=tcp
+
+# How many samples
+SAMPLES=${SAMPLES:-1000}
+#SAMPLES="10000"
+
+BWPEAK=${BWPEAK:-1000000000}
+
+# Packet sizes to test
+PKTSIZES=${PKTSIZES:-"1448
+1217
+1120
+1056
+1024
+1000
+861
+800
+724
+680
+608
+590
+580
+512
+430
+362
+304
+256
+215
+181
+152
+128
+90
+76
+64"}
+
+PKTSIZES="64 128 256 512 1024 1448"
+
+PKTSIZES="1472"
+
+HOLDOFF=${HOLDOFF:-100000}
+WARMUP=${WARMUP:-10}
+COOLDOWN=`expr $SAMPLES / 1000 + 5`
+
+case ${SOCKTYPE} in
+	udp|tcp) TESTTARGET=$TESTTARGETIP
+	;;
+	raw)     TESTTARGET=$TESTTARGETMAC
+	;;
+	*)	echo >&2 "Unknown socket type $SOCKTYPE"
+		exit 1
+        ;;
+esac
+
+ntin=0
+for i in $TINNIES
+do
+	clients="$clients --client=vb$i"
+	ntin=`expr $ntin + 1`
+done
+
+
+cat <<-EOF
+	IP benchmark run at `date`
+	Target=$TARGET 
+	Using VBs numbers: $TINNIES
+	Test = latency
+	Type = $SOCKTYPE
+	Using warmup $WARMUP cooldown $COOLDOWN
+	Testing packets of  $PKTSIZES
+EOF
+
+for BWPEAK in 100000000 200000000 300000000 400000000 500000000 600000000 700000000 800000000 900000000
+do
+
+for i in $PKTSIZES
+do
+	BPS=`echo "($i * ${BWPEAK})/(($i+38)*$ntin)"|bc`
+	# Calculate samples for 10-second test run.
+	SAMPLES=`echo "10 * $BPS / $i / 8" | bc`
+        echo "${BPS} test started!"
+	ipbench -r  $clients --test-target=$TESTTARGET --test=latency \
+		--test-args="bps=$BPS,size=$i,socktype=$SOCKTYPE,samples=$SAMPLES,warmup=$WARMUP,cooldown=$COOLDOWN,iface=enp3s0" --test-port=$PORT \
+		--target-test="cpu_target" \
+		--target-test-hostname=$TARGET \
+		--target-test-args="warmup=$WARMUP,cooldown=$COOLDOWN,holdoff=$HOLDOFF" \
+
+done
+done
