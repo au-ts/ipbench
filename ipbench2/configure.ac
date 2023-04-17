@@ -1,4 +1,4 @@
-AC_PREREQ([2.71])
+AC_PREREQ([2.69])
 
 AC_INIT([ipbench],[2.0.3])
 
@@ -9,7 +9,7 @@ AC_DISABLE_STATIC
 
 LT_INIT(dlopen)
 
-AC_PROG_SWIG(4.1.0)
+AC_PROG_SWIG(4.0.0)
 AM_PATH_PYTHON([3.9])
 SWIG_PYTHON
 

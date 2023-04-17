@@ -1,7 +1,10 @@
 extern int errcode;
 extern char errmsg[256];
 
-int ipbench_error(int, char*);
+
+int ipbench_error(int code, char *msg);
+
+int ipbench_plugin_error(int code, char *msg, char *source);
 
 /* total hack alert : these values copied because
    swig doesn't really provide them in any header 

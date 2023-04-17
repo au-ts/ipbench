@@ -166,7 +166,7 @@ AC_DEFUN([AC_PYTHON_DEVEL],[
         AC_SUBST([PYTHON_LDFLAGS],["-L$python_path -lpython$PYTHON_VERSION"])
         #
         python_site=`echo $python_path | sed "s/config/site-packages/"`
-        AC_SUBST([PYTHON_SITE_PKG],[$python_site])
+        AC_SUBST([PYTHON_SITE_P1KG],[$python_site])
         #
         # libraries which must be linked in when embedding
         #
