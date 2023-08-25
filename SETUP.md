@@ -29,7 +29,7 @@ Autotools (correctly) puts files for user built packages in `/usr/local/lib` whe
 If running ipbench results in a python import error, you can add the location of the install to your pythonpath as follows:
 
 ```
-export PYTHONPATH=$PYTHONPATH:/usr/local/(python-version)/site-packages
+export PYTHONPATH=$PYTHONPATH:/usr/local/lib/(python-version)/site-packages
 ```
 
 Running this line will fix the issue for your current terminal session, and you can make this fix permanent by adding it to `.profile` and/or `.bashrc`.
