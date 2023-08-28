@@ -45,3 +45,12 @@ If you get an error about finding shared files like below:
 
 ... run `sudo ldconfig -v` to prompt Debian to reregister your library files and this will rectify the issue.
 
+The best way to build on Debian is to use the Debian devscripts.  Do:
+```
+sudo apt install devscripts
+cd ipbench2
+debuild -b -uc -us
+```
+to build Debian packages that can then be installed.
+
+
