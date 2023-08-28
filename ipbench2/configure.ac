@@ -4,7 +4,7 @@ AC_INIT([ipbench],[2.0.3])
 
 AC_CONFIG_SRCDIR(src/ipbench.py)
 
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([foreign])
 AC_DISABLE_STATIC
 
 LT_INIT(dlopen)
