@@ -11,7 +11,7 @@ Luke Macpherson
 Charles Gray 
  - orignal libnfs code for latency nfs test
 
-Peter Chubb <peter.chubb@data61.csiro.au>
+Peter Chubb <peter.chubb@unsw.edu.au>
  - discard test, changes to latency test
 
 Darren Williams
