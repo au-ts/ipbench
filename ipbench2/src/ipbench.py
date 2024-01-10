@@ -531,7 +531,8 @@ def main():
 
             client["testobj"] = IpbenchTestClient(client["hostname"], client["port"],
                                                   client["test_target"], client["test_port"],
-                                                  client_id, OPTIONS.test, client_test, client["test_args"])
+                                                  client_id, OPTIONS.test, client_test,
+                                                  test_args=client["test_args"])
             client["testobj"].connect()
             client_id = client_id + 1
             client["testobj"].setup()
