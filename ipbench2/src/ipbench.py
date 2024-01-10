@@ -516,7 +516,7 @@ def main():
             target["shuntobj"].setup_controller(OPTIONS.target_controller_args)
 
             target["testobj"] = IpbenchTestTarget(target["hostname"], target["port"],
-                                                  target["shuntobj"], target["test"],
+                                                  target["test"], target["shuntobj"],
                                                   test_args=target["test_args"])
             target["testobj"].connect()
             target["testobj"].setup()
