@@ -31,51 +31,91 @@ ipbench [\fB\-h\fP|\fB\-\-help\fP]
 ipbench \fB\-\-version\fP
 .SH "DESCRIPTION"
 .LP 
-Controls a number of remote testing clients to run a specified test and report their results.
+The ipbench network benchmarking suite consists of three main components.
+.LP
+- A 'target' program running on the machine under study
+.br
+- Multiple 'client' programs running on other machines, which will test the target machine's performance
+.br
+- A 'controller', which tells the others what to do and coordinates starting and stopping them
+.LP
+The ipbench program fulfills the role of controller, allowing the user to specify where the clients
+and target are, how they should communicate, and what tests they should run.
+.LP
+The ipbenchd program fulfills the role of client. An instance of ipbenchd should be running on
+the relevant port on each client machine before ipbench is invoked.
+.LP
+The ipbenchd program can also fulfill the role of target, running on the target machine.
+However, the target machine might not be running a complete operating system,
+making it difficult to install ipbenchd. In this case you should implement your own
+target program on the target machine.
 .SH "OPTIONS"
 .LP
 .TP
+\fB\-c\fP <\fIclient\fP>|\fB\-\-client\fP=<\fIclient\fP>
+Hostname or IP on which a client ipbenchd instance will be running,
+for the ipbench controller (this program) to send commands to. Repeat this argument
+multiple times to specify multiple clients.
+.TP
 \fB\-p\fP <\fIport\fP>|\fB\-\-port\fP=<\fIport\fP>
-Specify a port to connect to remote clients.
+Port on the client machines which the controller
+will use to contact the clients. ipbenchd must be listening on this port
+on each client.
+.TP
+\fB\-t\fP <\fItest\fP>|\fB\-\-test\fP=<\fItest\fP>
+Name of test which the clients will all load and run.
+.TP 
+\fB\-a\fP <\fIargs\fP>|\fB\-\-test\-args\fP=<\fIargs\fP>
+Arguments which will be provided to each client, affecting hwo they
+perform their test.
+.TP
+\fB\-r\fP|\fB\-\-reset\fP
+Sends an ABORT signal to each client from the controller, causing the
+connection to close and reopen, each time the controller sets up for a test.
+This might be useful if a test fails to complete properly.
+.TP 
+\fB\-T\fP <\fIhostname\fP>|\fB\-\-test\-target\fP=<\fIhostname\fP>
+Hostname or IP address of the target machine that the clients will use to
+communicate with the target and perform their tests.
+.TP 
+\fB\-P\fP <\fIport\fP>|\fB\-\-test\-port\fP=<\fIport\fP>
+Port on the target machine that the clients will use to communicate with the
+target and perform their tests.
+The target needs to be listening on this port.
+The target daemon can be ipbenchd in target mode, or another program.
+.TP
+\fB\-\-target\-test\-hostname\fP=<\fIhostname\fP>
+Hostname or IP address of the target machine that the controller will use to
+communicate with the target.
+.TP 
+\fB\-\-target\-test\-port\fP=<\fIport\fP>
+Port on the target machine that the controller will use to communicate with
+the target and instruct it to run tests.
+The target needs to be listening on this port.
+The target daemon can be ipbenchd in target mode, or another program.
+.TP 
+\fB\-\-target\-test\fP=<\fItarget-test\fP>
+Name of test which the target will load and run. This allows monitoring aspects
+of the target system while the clients test its network performance.
+.TP 
+\fB\-\-target\-test\-args\fP=<\fIargs\fP>
+Arguments which will be provided to the target, affecting how it performs any
+tests it runs on itself.
+.TP 
+\fB\-\-test\-controller\-args\fP=<\fIargs\fP>
+This string is ultimately passed to the setup_controller function in the
+implementation of any test which runs on the clients. See each client-side test
+for what arguments are available.
+.TP 
+\fB\-\-target\-test\-controller\-args\fP=<\fIargs\fP>
+This string is ultimately passed to the setup_controller function in the
+implementation of any test which runs on the target. See each target-side test
+for what arguments are available.
 .TP
 \fB\-\-config\fP=<\fIconfig\fP>
 Specify an input config file (XML based, see documentation).
-.TP
-\fB\-c\fP <\fIclient\fP>|\fB\-\-client\fP=<\fIclient\fP>
-Specify a remote client to connect to. Repeat for multiple clients.
-.TP
-\fB\-t\fP <\fItest\fP>|\fB\-\-test\fP=<\fItest\fP>
-The test to run.
-.TP 
-\fB\-a\fP <\fIargs\fP>|\fB\-\-test\-args\fP=<\fIargs\fP>
-Arguments for the test.
-.TP
-\fB\-r\fP|\fB\-\-reset\fP
-Send an ABORT before setup.
-.TP 
-\fB\-T\fP <\fIhostname\fP>|\fB\-\-test\-target\fP=<\fIhostname\fP>
-The target machine that the clients should direct their testing towards.
-.TP 
-\fB\-P\fP <\fIport\fP>|\fB\-\-test\-port\fP=<\fIport\fP>
-The port the target machines should use to run the test on.
-.TP
-\fB\-\-target\-test\fP=<\fItarget-test\fP>
-Companion test to run on the DUT.
-.TP 
-\fB\-\-target\-test\-hostname\fP=<\fIhostname\fP>
-The IP address or hostname to connect to the target test machine.
-.TP 
-\fB\-\-target\-test\-args\fP=<\fIargs\fP>
-Arguments for the companion test to run on the DUT.
-.TP 
-\fB\-\-target\-test\-port\fP=<\fIport\fP>
-Port to talk to the target test daemon.
-.TP 
-\fB\-\-target\-controller\-args\fP=<\fIargs\fP>
-Arguments for the controller for the main test.
-.TP 
-\fB\-\-target\-test\-controller\-args\fP=<\fIargs\fP>
-Arguments for the controller for the target test.
+This allows you to provide ipbench options with more flexibility
+than the command line.
 .TP 
 \fB\-d\fP|\fB--debug\fP
 Enable Debugging; verbose output.
@@ -103,4 +143,4 @@ and Matthew Rossouw <matthew.rossouw@unsw.edu.au>.
 Man page by Christopher Irving <c.irving@unsw.edu.au>.
 .SH "SEE ALSO"
 .LP 
-ipbenchd(1) ipbenchtd(1)
+ipbenchd(1)
