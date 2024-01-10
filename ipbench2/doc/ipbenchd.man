@@ -18,6 +18,10 @@ This program is the client portion of the ipbench testing suite.  Each client mu
 .B sudo ipbenchd &
 .LP
 to run the daemon in the background.
+.br
+This daemon can also be used as the target portion of the testing suite, by running it with \fB\-t\fR
+.LP
+For more on the structure of the ipbench testing suite, see the man page for ipbench(1)
 .SH "OPTIONS"
 .LP 
 .TP 
