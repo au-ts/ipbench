@@ -601,13 +601,13 @@ def main():
     usage = "usage: %prog [options]"
     parser = OptionParser(usage, version="%prog 2.0")
     parser.add_option("-i", "--ip", dest="ip",
-                      help="Ip to bind to", type="string", default="", action="store")
+                      help="Makes the daemon bind to the specified ip. Default is to bind to all available ip addresses.", type="string", default="", action="store")
     parser.add_option("-p", "--port", dest="port",
-                      help="Port to listen on", type="int", default=8036, action="store")
+                      help="Makes the daemon listen on the specified port. Default is 8036.", type="int", default=8036, action="store")
     parser.add_option("-d", "--debug", dest="debug", action="store_true",
-                      help="Enable Debugging", default=False)
+                      help="Enable debugging; provide verbose output.", default=False)
     parser.add_option("-t", "--target", dest="target", action="store_true",
-                      help="Put the daemon in target mode")
+                      help="Put the daemon in target mode.")
 
     (OPTIONS, args) = parser.parse_args()
 

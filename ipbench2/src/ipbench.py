@@ -316,55 +316,55 @@ def main():
     usage = "usage: %prog [options]"
     parser = OptionParser(usage, version="%prog 2.1")
     parser.add_option("-d", "--debug", dest="debug", action="store_true",
-                      help="Enable Debugging", default=False)
-
-    parser.add_option("-p", "--port", dest="port",
-                      help="Specify a port to connect to remote clients.",
-                      type="int", default=8036, action="store")
-
-    parser.add_option("--config", dest="config", action="store",
-                      help="Specify an input config file (XML based, see documentation)", default=None)
+                      help="Enable debugging; verbose output.", default=False)
 
     parser.add_option("-c", "--client", dest="clients", action="append",
-                      help="Specify a remote client to connect to.", default=[])
+                      help="Hostname or IP of a client for the controller to connect to. Repeat this argument multiple times to specify multiple clients.", default=[])
+
+    parser.add_option("-p", "--port", dest="port",
+                      help="Port on the clients which the controller will connect to.",
+                      type="int", default=8036, action="store")
 
     parser.add_option("-t", "--test", dest="test", action="store",
-                      help="The test to run", default=None)
+                      help="Name of test the clients will run.", default=None)
 
     parser.add_option("-a", "--test-args", dest="test_args", action="store",
-                      type="string", help="Arguments for the test", default="")
+                      type="string", help="Arguments affecting how the clients run their test.", default="")
 
     parser.add_option("-r", "--reset", dest="reset", action="store_true",
-                      help="Send an ABORT before setup", default=False)
+                      help="Send an ABORT to clients before each setup. Useful for cleaning up failed tests.", default=False)
 
     parser.add_option("-T", "--test-target", dest="test_target", action="store",
-                      help="The target machine that clients should direct testing towards",
+                      help="Hostname or IP of the target that the clients will direct their tests at.",
                       default=None)
 
     parser.add_option("-P", "--test-port", dest="test_port", action="store", type="int",
-                      help="The port the target machines should use for the test",
+                      help="Port on the target that the clients will direct their tests at.",
                       default=0)
 
-    parser.add_option("--target-test", dest="target_test", action="store", type="string",
-                      help="Companion test to run on the DUT", default=None)
-
     parser.add_option("--target-test-hostname", dest="target_test_hostname", action="store", type="string",
-                      help="The IP address or hostname to connect to the target test machine", default=None)
-
-    parser.add_option("--target-test-args", dest="target_test_args", action="store", type="string",
-                      help="Arguments for the companion test to run on the DUT")
+                      help="Hostname or IP of the target for the controller to connect to.", default=None)
 
     parser.add_option("--target-test-port", dest="target_test_port", action="store", type="int",
-                      help="Port to talk to the target test daemon",
+                      help="Port on the target that the controller will connect to.",
                       default=8037)
 
+    parser.add_option("--target-test", dest="target_test", action="store", type="string",
+                      help="Name of test the target will run.", default=None)
+
+    parser.add_option("--target-test-args", dest="target_test_args", action="store", type="string",
+                      help="Arguments affecting how the target runs its test.")
+
     parser.add_option("--test-controller-args", dest="controller_args", action="store", type="string",
-                      help="Arguments for the controller for the main test",
+                      help="Arguments for the setup_controller function of the test running on the clients. See individual tests for details.",
                       default=None)
 
     parser.add_option("--target-test-controller-args", dest="target_controller_args", action="store", type="string",
-                      help="Arguments for the controller for the target test",
+                      help="Arguments for the setup_controller function of the test running on the target. See individual tests for details.",
                       default=None)
+
+    parser.add_option("--config", dest="config", action="store",
+                      help="Specify an input config file (XML based, see documentation). Allows flexible and repeatable configuration without command line arguments.", default=None)
 
     (OPTIONS, _) = parser.parse_args()
 

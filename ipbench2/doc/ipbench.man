@@ -66,11 +66,11 @@ on each client.
 Name of test which the clients will all load and run.
 .TP 
 \fB\-a\fP <\fIargs\fP>|\fB\-\-test\-args\fP=<\fIargs\fP>
-Arguments which will be provided to each client, affecting hwo they
+Arguments which will be provided to each client, affecting how they
 perform their test.
 .TP
 \fB\-r\fP|\fB\-\-reset\fP
-Sends an ABORT signal to each client from the controller, causing the
+Sends an ABORT message to each client from the controller, causing the
 connection to close and reopen, each time the controller sets up for a test.
 This might be useful if a test fails to complete properly.
 .TP 
@@ -118,7 +118,7 @@ This allows you to provide ipbench options with more flexibility
 than the command line.
 .TP 
 \fB\-d\fP|\fB--debug\fP
-Enable Debugging; verbose output.
+Enable debugging; verbose output.
 .TP 
 \fB\-\-version\fP
 Show program's version number and exit.
