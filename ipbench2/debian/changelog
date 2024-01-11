@@ -1,3 +1,10 @@
+ipbench (2.1.1) unstable; urgency=medium
+
+  * Overhaul by Matthew Rossouw
+  * Updated man pages by Christopher Irving
+
+ -- Christopher Irving <c.irving@unsw.edu.au>  Thu, 11 Jan 2024 14:13:42 +1100
+
 ipbench (2.0.3) unstable; urgency=medium
 
   * Update to Python 3.9

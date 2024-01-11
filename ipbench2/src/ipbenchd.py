@@ -599,7 +599,7 @@ def main():
     """
     global OPTIONS, SERVER
     usage = "usage: %prog [options]"
-    parser = OptionParser(usage, version="%prog 2.0")
+    parser = OptionParser(usage, version="%prog 2.1.1")
     parser.add_option("-i", "--ip", dest="ip",
                       help="Makes the daemon bind to the specified ip. Default is to bind to all available ip addresses.", type="string", default="", action="store")
     parser.add_option("-p", "--port", dest="port",
