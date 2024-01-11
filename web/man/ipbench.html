@@ -1,10 +1,10 @@
-Content-type: text/html
+Content-type: text/html; charset=UTF-8
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <HTML><HEAD><TITLE>Man page of ipbench</TITLE>
 </HEAD><BODY>
 <H1>ipbench</H1>
-Section: ipbench (1)<BR>Updated: 17 Dec 2003<BR><A HREF="#index">Index</A>
+Section: ipbench (1)<BR>Updated: Dec 2023<BR><A HREF="#index">Index</A>
 <A HREF="/cgi-bin/man/man2html">Return to Main Contents</A><HR>
 
 <A NAME="lbAB">&nbsp;</A>
@@ -16,57 +16,133 @@ ipbench - Control an ipbench session
 <A NAME="lbAC">&nbsp;</A>
 <H2>SYNTAX</H2>
 
-<P>
+<DL COMPACT>
+<DT>
 
-ipbench <B>--client</B>=<I>client_hostname</I>... [<B>--client-port</B>=<I>port</I>]
+<DD>ipbench [<B>-c</B> &lt;<I>client</I>&gt;|<B>--client</B>=&lt;<I>client</I>&gt; ...]
+[<B>-p</B> &lt;<I>port</I>&gt;|<B>--port</B>=&lt;<I>port</I>&gt;]
 <BR>
 
-<B>--test</B>=<I>testname</I> <B>--test-target</B>=<I>test_target_hostname</I>
+[<B>-t</B> &lt;<I>test</I>&gt;|<B>--test</B>=&lt;<I>test</I>&gt;]
+[<B>-a</B> &lt;<I>args</I>&gt;|<B>--test-args</B>=&lt;<I>args</I>&gt;]
 <BR>
 
-[<B>--test-args</B>=<I>args</I>] [<B>--test-port</B>=<I>port</I>] 
+[<B>-r</B>|<B>--reset</B>]
+[<B>-T</B> &lt;<I>hostname</I>&gt;|<B>--test-target</B>=&lt;<I>hostname</I>&gt;]
 <BR>
 
-<B>[--target</B>=<I>target_hostname</I>] [<B>--target-port</B>=<I>port</I>]
+[<B>-P</B> &lt;<I>port</I>&gt;|<B>--test-port</B>=&lt;<I>port</I>&gt;]
+[<B>--target-test-hostname</B>=&lt;<I>hostname</I>&gt;]
 <BR>
 
-[<B>--target-args</B>=<I>args</I>]
+[<B>--target-test-port</B>=&lt;<I>port</I>&gt;]
+[<B>--target-test</B>=&lt;<I>target-test</I>&gt;]
 <BR>
 
-[<B>-v</B>] [<B>-V</B>] [<B>-h</B>|<B>--help</B>]
+[<B>--target-test-args</B>=&lt;<I>args</I>&gt;]
+[<B>--test-controller-args</B>=&lt;<I>args</I>&gt;]
+<BR>
+
+[<B>--target-test-controller-args</B>=&lt;<I>args</I>&gt;]
+[<B>--config</B>=&lt;<I>config</I>&gt;]
+[<B>-d</B>|<B>--debug</B>]
+
+<DT>
+<DD>ipbench [<B>-h</B>|<B>--help</B>]
+<DT>
+<DD>ipbench <B>--version</B>
+</DL>
 <A NAME="lbAD">&nbsp;</A>
 <H2>DESCRIPTION</H2>
 
 <P>
 
-Controls a number of remote testing clients to run a specified test and report their results.
+The ipbench network benchmarking suite consists of three main components.
+<P>
+
+- A 'target' program running on the machine under study
+<BR>
+
+- Multiple 'client' programs running on other machines, which will test the target machine's performance
+<BR>
+
+- A 'controller', which tells the others what to do and coordinates starting and stopping them
+<P>
+
+The ipbench program fulfills the role of controller, allowing the user to specify where the clients
+and target are, how they should communicate, and what tests they should run.
+<P>
+
+The ipbenchd program fulfills the role of client. An instance of ipbenchd should be running on
+the relevant port on each client machine before ipbench is invoked.
+<P>
+
+The ipbenchd program can also fulfill the role of target, running on the target machine.
+However, the target machine might not be running a complete operating system,
+making it difficult to install ipbenchd. In this case you should implement your own
+target program on the target machine.
 <A NAME="lbAE">&nbsp;</A>
 <H2>OPTIONS</H2>
 
 <P>
 
 <DL COMPACT>
-<DT><B>--client</B>=<I>hostname</I>...<DD>
-Specify a remote client to connect to.  Each client must be running an invocation of <I><A HREF="/cgi-bin/man/man2html?1+ipbenchd">ipbenchd</A></I>(1).  You may specify multiple clients by passing the <B>--client</B> argument many times.
-<DT><B>--client-port</B>=<I>port</I><DD>
-Specify a port to connect to remote client.  This will be global, i.e. all clients will be contacted on this port.
-<DT><B>--test</B>=<I>name</I><DD>
-The test to run.  Use <I>-h</I> to see a list of possible tests.
-<DT><B>--test-args</B>=<I>arguments</I><DD>
-Arguments for the test.  See test specific documentation for possible arguments; by leaving this argument out you will get the test defaults.
-<DT><B>--test-target</B>=<I>hostname</I><DD>
-The target machine that the clients should direct their testing towards.
-<DT><B>--test-port</B>=<I>port</I><DD>
-The port to run the test on.  Each test has an inbuilt port it will use by default.
-<DT><B>--target</B>=<I>target_hostname</I><DD>
-If the test has companion test that is run on the target machine, this flag will activate it.  The target machine must be running <I><A HREF="/cgi-bin/man/man2html?1+ipbenchtd">ipbenchtd</A></I>(1).  See the test documentation for more information about the companion target test.
-<DT><B>--target-args</B>=<I>args</I><DD>
-Arguments for the companion test on the target.
-<DT><B>-v</B><DD>
-Be more verbose.
-<DT><B>-V</B><DD>
-Show version information.
-<DT><B>-h</B> | <B>--help</B><DD>
+<DT><B>-c</B> &lt;<I>client</I>&gt;|<B>--client</B>=&lt;<I>client</I>&gt;<DD>
+Hostname or IP on which a client ipbenchd instance will be running,
+for the ipbench controller (this program) to send commands to. Repeat this argument
+multiple times to specify multiple clients.
+<DT><B>-p</B> &lt;<I>port</I>&gt;|<B>--port</B>=&lt;<I>port</I>&gt;<DD>
+Port on the client machines which the controller
+will use to contact the clients. ipbenchd must be listening on this port
+on each client.
+<DT><B>-t</B> &lt;<I>test</I>&gt;|<B>--test</B>=&lt;<I>test</I>&gt;<DD>
+Name of test which the clients will all load and run.
+<DT><B>-a</B> &lt;<I>args</I>&gt;|<B>--test-args</B>=&lt;<I>args</I>&gt;<DD>
+Arguments which will be provided to each client, affecting how they
+perform their test.
+<DT><B>-r</B>|<B>--reset</B><DD>
+Sends an ABORT message to each client from the controller, causing the
+connection to close and reopen, each time the controller sets up for a test.
+This might be useful if a test fails to complete properly.
+<DT><B>-T</B> &lt;<I>hostname</I>&gt;|<B>--test-target</B>=&lt;<I>hostname</I>&gt;<DD>
+Hostname or IP address of the target machine that the clients will use to
+communicate with the target and perform their tests.
+<DT><B>-P</B> &lt;<I>port</I>&gt;|<B>--test-port</B>=&lt;<I>port</I>&gt;<DD>
+Port on the target machine that the clients will use to communicate with the
+target and perform their tests.
+The target needs to be listening on this port.
+The target daemon can be ipbenchd in target mode, or another program.
+<DT><B>--target-test-hostname</B>=&lt;<I>hostname</I>&gt;<DD>
+Hostname or IP address of the target machine that the controller will use to
+communicate with the target.
+<DT><B>--target-test-port</B>=&lt;<I>port</I>&gt;<DD>
+Port on the target machine that the controller will use to communicate with
+the target and instruct it to run tests.
+The target needs to be listening on this port.
+The target daemon can be ipbenchd in target mode, or another program.
+<DT><B>--target-test</B>=&lt;<I>target-test</I>&gt;<DD>
+Name of test which the target will load and run. This allows monitoring aspects
+of the target system while the clients test its network performance.
+<DT><B>--target-test-args</B>=&lt;<I>args</I>&gt;<DD>
+Arguments which will be provided to the target, affecting how it performs any
+tests it runs on itself.
+<DT><B>--test-controller-args</B>=&lt;<I>args</I>&gt;<DD>
+This string is ultimately passed to the setup_controller function in the
+implementation of any test which runs on the clients. See each client-side test
+for what arguments are available.
+<DT><B>--target-test-controller-args</B>=&lt;<I>args</I>&gt;<DD>
+This string is ultimately passed to the setup_controller function in the
+implementation of any test which runs on the target. See each target-side test
+for what arguments are available.
+<DT><B>--config</B>=&lt;<I>config</I>&gt;<DD>
+Specify an input config file (XML based, see documentation).
+This allows you to provide ipbench options with more flexibility
+than the command line.
+<DT><B>-d</B>|<B>--debug</B><DD>
+Enable debugging; verbose output.
+<DT><B>--version</B><DD>
+Show program's version number and exit.
+<DT><B>-h</B>|<B>--help</B><DD>
 Show help information.
 </DL>
 <A NAME="lbAF">&nbsp;</A>
@@ -86,34 +162,25 @@ Show help information.
 
 <P>
 
-The latency test might be run as:
-<P>
-
-ipbench --client=tinny0 --client=tinny1 --client-port=6123
-<BR>
-
---target=leffe --active-target --target-port=6124 
-<BR>
-
---target-args=&quot;warmup=10,cooldown=10&quot;
-<BR>
-
---test=latency --test-port=5555
-<BR>
-
---test-args=&quot;bps=100000000,size=128,socktype=udp,warmup=10,cooldown=10&quot;
+examples
 <A NAME="lbAI">&nbsp;</A>
 <H2>AUTHORS</H2>
 
 <P>
 
-Ian Wienand
+ipbench by Ian Wienand &lt;<A HREF="mailto:ianw@gelato.unsw.edu.au">ianw@gelato.unsw.edu.au</A>&gt;
+<BR>
+
+and Matthew Rossouw &lt;<A HREF="mailto:matthew.rossouw@unsw.edu.au">matthew.rossouw@unsw.edu.au</A>&gt;.
+<BR>
+
+Man page by Christopher Irving &lt;<A HREF="mailto:c.irving@unsw.edu.au">c.irving@unsw.edu.au</A>&gt;.
 <A NAME="lbAJ">&nbsp;</A>
 <H2>SEE ALSO</H2>
 
 <P>
 
-<A HREF="/cgi-bin/man/man2html?1+ipbenchd">ipbenchd</A>(1) <A HREF="/cgi-bin/man/man2html?1+ipbenchtd">ipbenchtd</A>(1)
+<A HREF="/cgi-bin/man/man2html?1+ipbenchd">ipbenchd</A>(1)
 <P>
 
 <HR>
@@ -133,6 +200,6 @@ Ian Wienand
 This document was created by
 <A HREF="/cgi-bin/man/man2html">man2html</A>,
 using the manual pages.<BR>
-Time: 00:26:59 GMT, December 17, 2003
+Time: 02:48:51 GMT, January 11, 2024
 </BODY>
 </HTML>
