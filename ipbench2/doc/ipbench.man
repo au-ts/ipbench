@@ -7,16 +7,22 @@ ipbench \- Control an ipbench session
 .ad l
 ipbench [\fB\-c\fP <\fIclient\fP>|\fB\-\-client\fP=<\fIclient\fP> ...]
 [\fB\-p\fP <\fIport\fP>|\fB\-\-port\fP=<\fIport\fP>]
+.br
 [\fB\-t\fP <\fItest\fP>|\fB\-\-test\fP=<\fItest\fP>]
 [\fB\-a\fP <\fIargs\fP>|\fB\-\-test\-args\fP=<\fIargs\fP>]
+.br
 [\fB\-r\fP|\fB\-\-reset\fP]
 [\fB\-T\fP <\fIhostname\fP>|\fB\-\-test\-target\fP=<\fIhostname\fP>]
+.br
 [\fB\-P\fP <\fIport\fP>|\fB\-\-test\-port\fP=<\fIport\fP>]
 [\fB\-\-target\-test\-hostname\fP=<\fIhostname\fP>]
+.br
 [\fB\-\-target\-test\-port\fP=<\fIport\fP>]
 [\fB\-\-target\-test\fP=<\fItarget-test\fP>]
+.br
 [\fB\-\-target\-test\-args\fP=<\fIargs\fP>]
 [\fB\-\-test\-controller\-args\fP=<\fIargs\fP>]
+.br
 [\fB\-\-target\-test\-controller\-args\fP=<\fIargs\fP>]
 [\fB\-\-config\fP=<\fIconfig\fP>]
 [\fB\-d\fP|\fB--debug\fP]
