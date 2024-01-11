@@ -1,4 +1,4 @@
-.TH "ipbench" "1" "Dec 2023" "Ian Wienand, Matthew Rossouw" "ipbench"
+.TH "ipbench" "1" "Jan 2024" "Ian Wienand, Matthew Rossouw" "ipbench"
 .SH "NAME"
 .LP 
 ipbench \- Control an ipbench session

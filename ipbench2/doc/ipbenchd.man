@@ -1,4 +1,4 @@
-.TH "ipbenchd" "1" "Dec 2023" "Ian Wienand, Matthew Rossouw" ""
+.TH "ipbenchd" "1" "Jan 2024" "Ian Wienand, Matthew Rossouw" ""
 .SH "NAME"
 .LP 
 ipbenchd \- Client daemon for the ipbench testing suite
