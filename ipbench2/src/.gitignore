@@ -5,6 +5,5 @@ config.h
 config.h.in
 ipbench
 ipbenchd
-ipbenchtd
 stamp-h
 stamp-h1
