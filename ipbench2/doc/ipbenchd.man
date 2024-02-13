@@ -15,7 +15,7 @@ ipbenchd \fB\-\-version\fP
 .LP 
 This program is the client portion of the ipbench testing suite.  Each client must be running this daemon to receive commands from the controlling node. The daemon must be run as root to allow access to ports. It also does not fork into a separate process automatically. So you may want to run something like
 .LP
-.B sudo ipbenchd &
+.B python3 /usr/bin/ipbenchd &
 .LP
 to run the daemon in the background.
 .br
