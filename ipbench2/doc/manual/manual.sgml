@@ -16,7 +16,7 @@
    
     <copyright>
       <year>2004, 2010</year>
-      <holder role='mailto:ianw@gelato.unsw.edu.au'>Ian Wienand</holder>
+      <holder>Ian Wienand</holder>
     </copyright>
     
     <pubdate role='rcs'>$Date$</pubdate>
@@ -287,6 +287,20 @@
 	</sect2>
             </sect1>
 
+    </chapter>
+
+    <chapter id="latencycheck"><title>Latency Check</title>
+      <sect1 id="latencycheck-about"><title>About></title>
+	<para>
+	  The Latency-check test is identical to the latency test,
+	  except it expects the target to update the second 64-bit  word in
+	  each packet, by setting it to one more than the first 64-bit
+	  word.
+	</para><para>
+	  The count of the number packets where the second word is not
+	  one more than the first is printed out as the last field
+	</para>
+      </sect1>
     </chapter>
 
     <chapter id="tbench"><title>Tbench</title>
