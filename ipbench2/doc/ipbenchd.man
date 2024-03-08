@@ -1,33 +1,47 @@
-.TH "ipbenchd" "1" "17 Dec 2003" "Ian Wienand" ""
+.TH "ipbenchd" "1" "Mar 2024" "Ian Wienand, Matthew Rossouw, Peter Chubb, Christopher Irving" ""
 .SH "NAME"
 .LP 
 ipbenchd \- Client daemon for the ipbench testing suite
 .SH "SYNTAX"
 .LP 
-ipbenchd [\fB\-\-plugindir\fP=\fIpath\fP] [\fB\-\-port\fP=\fIport\fP] [\fB\-\-nofork\fP] [\fB\-v\fP] [\fB\-V\fP] [\fB\-h\fP|\fB\-\-help\fP]
+ipbenchd [\fB\-i\fR <\fIip\fP>|\fB\-\-ip\fP=<\fIip\fP>]
+[\fB\-p\fR <\fIport\fP>|\fB\-\-port\fP=<\fIport\fP>]
+[\fB\-t\fP|\fB\-\-target\fP] [\fB\-d\fP|\fB\-\-debug\fP]
+.br
+ipbenchd \fB\-h\fP|\fB\-\-help\fR
+.br
+ipbenchd \fB\-\-version\fP
 .SH "DESCRIPTION"
 .LP 
-This program is the client portion of the ipbench testing suite.  Each client must be running this daemon to receive commands from the controlling node.
+This program is the client portion of the ipbench testing suite.  Each client must be running this daemon to receive commands from the controlling node. The daemon must be run as root to allow access to ports. It also does not fork into a separate process automatically. So you may want to run something like
+.LP
+.B sudo /usr/bin/ipbenchd &
+.LP
+to run the daemon in the background.
+.br
+This daemon can also be used as the target portion of the testing suite, by running it with \fB\-t\fR
+.LP
+For more on the structure of the ipbench testing suite, see the man page for ipbench(1)
 .SH "OPTIONS"
 .LP 
 .TP 
-<fb>\-\-plugindir\fR <\fIpath\fP>
-Path to the ipbench test plugins
+\fB\-\-version\fR
+Show the program's version number and exit.
 .TP 
-\fB\-\-port\fR <\fIport\fP>
-Makes the daemon listen on the specified \fIport\fP.
-.TP 
-\fB\-\-nofork\fR
-Do not fork the daemon into the background.
-.TP 
-\fB\-v\fR
-Be more verbose with output.
-.TP 
-\fB\-h\fP|\fB\-\-help\fP
+\fB\-h\fP|\fB\-\-help\fR
 Output help information.
 .TP 
-\fB\-V\fR
-Version information.
+\fB\-i\fR <\fIip\fP>|\fB\-\-ip\fP=<\fIip\fP>
+Makes the daemon bind to the specified \fIip\fP. Default is to bind to all available ip addresses.
+.TP 
+\fB\-p\fR <\fIport\fP>|\fB\-\-port\fP=<\fIport\fP>
+Makes the daemon listen on the specified \fIport\fP.
+.TP 
+\fB\-d\fP|\fB\-\-debug\fR
+Enable debugging; provide verbose output.
+.TP 
+\fB\-t\fP|\fB\-\-target\fR
+Put the daemon in target mode
 .SH "FILES"
 .LP 
 (none)
@@ -39,7 +53,13 @@ Version information.
 examples
 .SH "AUTHORS"
 .LP 
-Ian Wienand <ianw@gelato.unsw.edu.au>
+ipbenchd by Ian Wienand <ianw@gelato.unsw.edu.au>,
+.br
+Matthew Rossouw <matthew.rossouw@unsw.edu.au>,
+.br
+Peter Chubb <peter.chubb@unsw.edu.au>.
+.br
+Man page by Christopher Irving <c.irving@unsw.edu.au>.
 .SH "SEE ALSO"
 .LP 
 ipbench(1)

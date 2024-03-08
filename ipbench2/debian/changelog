@@ -1,3 +1,10 @@
+ipbench (2.1.1) unstable; urgency=medium
+
+  * Overhaul by Matthew Rossouw
+  * Updated man pages by Christopher Irving
+
+ -- Christopher Irving <c.irving@unsw.edu.au>  Fri, 08 Mar 2024 11:46:42 +1100
+
 ipbench (2.0.6) unstable; urgency=medium
 
   * Add latency-check test, that checks that the second 64 bit
