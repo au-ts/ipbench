@@ -1,4 +1,4 @@
-.TH "ipbenchd" "1" "Jan 2024" "Ian Wienand, Matthew Rossouw" ""
+.TH "ipbenchd" "1" "Mar 2024" "Ian Wienand, Matthew Rossouw, Peter Chubb, Christopher Irving" ""
 .SH "NAME"
 .LP 
 ipbenchd \- Client daemon for the ipbench testing suite
@@ -15,7 +15,7 @@ ipbenchd \fB\-\-version\fP
 .LP 
 This program is the client portion of the ipbench testing suite.  Each client must be running this daemon to receive commands from the controlling node. The daemon must be run as root to allow access to ports. It also does not fork into a separate process automatically. So you may want to run something like
 .LP
-.B python3 /usr/bin/ipbenchd &
+.B sudo /usr/bin/ipbenchd &
 .LP
 to run the daemon in the background.
 .br
@@ -53,9 +53,11 @@ Put the daemon in target mode
 examples
 .SH "AUTHORS"
 .LP 
-ipbenchd by Ian Wienand <ianw@gelato.unsw.edu.au>
+ipbenchd by Ian Wienand <ianw@gelato.unsw.edu.au>,
 .br
-and Matthew Rossouw <matthew.rossouw@unsw.edu.au>.
+Matthew Rossouw <matthew.rossouw@unsw.edu.au>,
+.br
+Peter Chubb <peter.chubb@unsw.edu.au>.
 .br
 Man page by Christopher Irving <c.irving@unsw.edu.au>.
 .SH "SEE ALSO"

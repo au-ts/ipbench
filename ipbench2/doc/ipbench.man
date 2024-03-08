@@ -1,4 +1,4 @@
-.TH "ipbench" "1" "Jan 2024" "Ian Wienand, Matthew Rossouw" "ipbench"
+.TH "ipbench" "1" "Mar 2024" "Ian Wienand, Matthew Rossouw, Peter Chubb, Christopher Irving" "ipbench"
 .SH "NAME"
 .LP 
 ipbench \- Control an ipbench session
@@ -138,9 +138,11 @@ Show help information.
 examples
 .SH "AUTHORS"
 .LP 
-ipbench by Ian Wienand <ianw@gelato.unsw.edu.au>
+ipbench by Ian Wienand <ianw@gelato.unsw.edu.au>,
 .br
-and Matthew Rossouw <matthew.rossouw@unsw.edu.au>.
+Matthew Rossouw <matthew.rossouw@unsw.edu.au>,
+.br
+Peter Chubb <peter.chubb@unsw.edu.au>.
 .br
 Man page by Christopher Irving <c.irving@unsw.edu.au>.
 .SH "SEE ALSO"
