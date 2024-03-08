@@ -231,7 +231,7 @@ measure_latency(int sock, uint64_t bps, uint64_t size,
 	uint64_t now, rtt, send_time;
 	uint64_t late_packets=0;         /* Missing packets */
 	uint64_t dropped_packets=0;      /* Dropped packets */
-        uint64_t bad_packets = 0;        /* packets that haven't been updated */
+	uint64_t bad_packets = 0;        /* packets that haven't been updated */
 	char *sbuf=NULL, *rbuf=NULL;
 	double send_rate;
 
@@ -283,7 +283,7 @@ measure_latency(int sock, uint64_t bps, uint64_t size,
 		do {
 			assert(torecv >= 0 && torecv <= size);
 			r = layer->recv_packet(&rbuf[size-torecv], torecv, MSG_WAITALL);
-			if (r != 0) {
+			if (r < 0) {
 				if (errno != EAGAIN) 
 				{
 					dbprintf("recv error: %s\n", strerror(errno));
@@ -591,7 +591,7 @@ int latency_marshall(char **data, int *size, double running_time)
 	tosend->throughput_requested = htonll(bps);
 	tosend->throughput_achieved  = htonll(result.bps);
 	tosend->throughput_sent = htonll(result.bps_sent);
-        tosend->bad_packets = htonll(result.bad_packets);
+	tosend->bad_packets = htonll(result.bad_packets);
 
 	*data = (char *)tosend;
 	*size = sizeof(struct marshalled_result) + (sizeof(uint64_t) * samples);
@@ -623,7 +623,7 @@ int latency_unmarshall(char *input, int input_len, char **data,
 	theresult->throughput_requested = ntohll(theresult->throughput_requested);
 	theresult->throughput_achieved  = ntohll(theresult->throughput_achieved);
 	theresult->throughput_sent = ntohll(theresult->throughput_sent);
-        theresult->bad_packets = ntohll(theresult->bad_packets);
+	theresult->bad_packets = ntohll(theresult->bad_packets);
 
 	dbprintf("Unmarshalling %"PRId64" samples\n", theresult->samples);
 
@@ -745,13 +745,13 @@ int latency_output(struct client_data data[], int nelem)
  	dbprintf("max rtt was %"PRId64" us\n", result.rtt_max);
  	dbprintf("rtt std dev was %"PRId64" us^2\n", result.rtt_std);
  	dbprintf("median rtt was %"PRId64" us\n", result.rtt_med);
-        dbprintf("Got %"PRId64" bad packets\n", result.bad_packets);
+	dbprintf("Got %"PRId64" bad packets\n", result.bad_packets);
  	dbprintf("\n");
 #endif
 	printf("%"PRId64",%"PRId64",%"PRId64",%"PRId64",%"PRId64",%"PRId64",%"PRId64",%.2f,%"PRId64",%"PRId64,
 	       total_requested_throughput, total_achieved_throughput, total_sent_throughput, packet_size,
 	       result.rtt_min, result.rtt_av, result.rtt_max, sqrt(result.rtt_std), result.rtt_med,
-            result.bad_packets);
+	       result.bad_packets);
 	/* when running with cpu_target test, we want the cpu usage argument as the last one */
 	if (with_cpu_target)
 		printf(",");

@@ -54,7 +54,7 @@ struct latency_result {
 	uint64_t sends;
 	uint64_t recvs;
 	uint64_t size;
-        uint64_t bad_packets;
+	uint64_t bad_packets;
 };
 
 /* We marshall the result up into this structure */
@@ -64,7 +64,7 @@ struct marshalled_result {
 	uint64_t size;
 	uint64_t sends;
 	uint64_t recvs;
-        uint64_t bad_packets;
+	uint64_t bad_packets;
 	uint64_t throughput_requested;
 	uint64_t throughput_achieved;
 	uint64_t throughput_sent;
