@@ -3,7 +3,28 @@ ipbench (2.1.1) unstable; urgency=medium
   * Overhaul by Matthew Rossouw
   * Updated man pages by Christopher Irving
 
- -- Christopher Irving <c.irving@unsw.edu.au>  Thu, 11 Jan 2024 14:13:42 +1100
+ -- Christopher Irving <c.irving@unsw.edu.au>  Fri, 08 Mar 2024 11:46:42 +1100
+
+ipbench (2.0.6) unstable; urgency=medium
+
+  * Add latency-check test, that checks that the second 64 bit
+    in a reply buffer is one more than the sequence number.
+  * Update to Swig 4.2.0
+
+ -- Peter Chubb <peterc@unsw.edu.au>  Wed, 06 Mar 2024 13:43:34 +1100
+
+ipbench (2.0.5) unstable; urgency=medium
+
+  * Close TCP socket after test is done.
+
+ -- Peter Chubb <peterc@unsw.edu.au>  Wed, 13 Dec 2023 13:59:37 +1100
+
+ipbench (2.0.4) unstable; urgency=medium
+
+  * Update to Python 3.11
+  * Cache microuptime calibration, to speed startup
+
+ -- Peter Chubb <peter.chubb@unsw.edu.au>  Tue, 14 Feb 2023 09:07:44 +1100
 
 ipbench (2.0.3) unstable; urgency=medium
 
