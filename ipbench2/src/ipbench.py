@@ -51,7 +51,7 @@ class IpbenchTestClient:
     Class encapsulating logic for controller machine to spin up tests.
     """
 
-    def __init__(self, hostname, port, test_target, test_port, client_id, test_name, test_ptr, test_args=None):
+    def __init__(self, hostname, port, test_target, test_port, client_id, test_name, test_ptr, test_args=""):
         self.hostname = hostname
         self.port = port
         self.test_port = test_port
@@ -353,7 +353,7 @@ def main():
                       help="Name of test the target will run.", default=None)
 
     parser.add_option("--target-test-args", dest="target_test_args", action="store", type="string",
-                      help="Arguments affecting how the target runs its test.")
+                      help="Arguments affecting how the target runs its test.", default="")
 
     parser.add_option("--test-controller-args", dest="controller_args", action="store", type="string",
                       help="Arguments for the setup_controller function of the test running on the clients. See individual tests for details.",
