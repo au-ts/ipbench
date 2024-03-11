@@ -22,7 +22,8 @@ HELP_TEXT = "\nHELP OPTIONS"           \
             "\nSETUP target port args" \
             "\nSTART"                  \
             "\nABORT"                  \
-            "\nSTATUS\n"
+            "\nSTATUS"                 \
+            "\nQUIT\n"
 
 HELP_TEXT_TARGET = "\nHELP OPTIONS" \
                    "\n------------" \
@@ -33,7 +34,8 @@ HELP_TEXT_TARGET = "\nHELP OPTIONS" \
                    "\nSTART"        \
                    "\nSTOP"         \
                    "\nABORT"        \
-                   "\nSTATUS\n"
+                   "\nSTATUS"       \
+                   "\nQUIT\n"
 
 OPTIONS = None
 SERVER = None
