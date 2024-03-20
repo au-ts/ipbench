@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdio.h>
 
 int errcode;
 char errmsg[256];
