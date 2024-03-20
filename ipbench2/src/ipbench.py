@@ -300,6 +300,12 @@ class IpbenchTestTarget(IpbenchTestClient):
         """
         self.test_ptr.unmarshall(client_data, valid)
 
+
+def error_exit(error_msg):
+    print(error_msg)
+    sys.exit(1)
+
+
 ##
 # main function
 ##
@@ -375,22 +381,19 @@ def main():
 
         tests = doc.findall('test')
         if (len(tests) > 1):
-            print("Error in config: please only have one <test> section")
-            sys.exit(1)
+            error_exit("Error in config: please only have one <test> section")
 
         # go through attributes for <test>
         for test in tests:
             OPTIONS.test = str(test.get("name", None))
             OPTIONS.test_args = str(test.get('args', ''))
-            OPTIONS.test_port = int(test.get('port', '0'))
-            OPTIONS.test_target = str(test.get('target', ''))
-            OPTIONS.controller_args = str(test.get('controller_args', ''))
+            OPTIONS.test_port = int(test.get('port', 0))
+            OPTIONS.test_target = str(test.get('target', None))
+            OPTIONS.controller_args = str(test.get('controller_args', None))
 
         # the test should be known by now
         if OPTIONS.test is None:
-            print(
-                "Error in config: please specify a test with either --test or in <test>")
-            sys.exit(1)
+            error_exit("Error in config: please specify a test with either --test or in <test>")
 
         # go through each <client>, override default values from attributes and add it to the
         # clients[] list
@@ -414,17 +417,20 @@ def main():
                 'test_target', str(OPTIONS.test_target))
 
             if newclient["hostname"] is None:
-                print("Please specifiy a hostname for the client!")
-                sys.exit(1)
+                error_exit("Please specifiy a hostname for the client!")
             clients.append(newclient)
 
         # now look for the <target_test> section, add to the targets list
         target_tests = doc.findall("target_test")
         for target_test in target_tests:
             target_test_name = target_test.get('name')
-            OPTIONS.target_test_args = target_test.get('args')
+            OPTIONS.target_test_args = target_test.get('args', '')
             OPTIONS.target_controller_args = str(
                 target_test.get('controller_args'))
+
+            # .get returns None if not found
+            if target_test_name == None:
+                error_exit("Please specify a name for the <target_test>!")
 
             # it is possible that there will be multiple <target_test>
             # sections, each  with multiple <targets> in them.  so
@@ -433,8 +439,7 @@ def main():
             tclients = doc.findall(
                 "target_test[@name=\'"+target_test_name+"\']/target")
             if (not (len(tclients) > 0)):
-                print("Please specify some targets in the <target_test> section!")
-                sys.exit(1)
+                error_exit("Please specify some targets in the <target_test> section!")
             for tclient in tclients:
                 newtarget = {
                     "hostname": OPTIONS.target_test_hostname,
@@ -452,16 +457,14 @@ def main():
                         'test_args', OPTIONS.target_test_args))
 
                     if newtarget["hostname"] is None:
-                        print("Please specify a hostname for the target!")
-                        sys.exit(1)
+                        error_exit("Please specify a hostname for the target!")
 
                 targets.append(newtarget)
 
     # finally, append things that are specified from the command line
     if OPTIONS.clients:
         if OPTIONS.test is None:
-            print("Please specify a test with --test!")
-            sys.exit(1)
+            error_exit("Please specify a test with --test!")
         for client in OPTIONS.clients:
             newclient = {
                 "hostname": client,
@@ -477,8 +480,7 @@ def main():
     # and one test.  but the simple case is covered
     if OPTIONS.target_test:
         if OPTIONS.target_test_hostname is None:
-            print("Please specify a target test hostname with --target-test-hostname!")
-            sys.exit(1)
+            error_exit("Please specify a target test hostname with --target-test-hostname!")
         newtarget = {
             "hostname": OPTIONS.target_test_hostname,
             "port": OPTIONS.target_test_port,
@@ -489,12 +491,10 @@ def main():
 
     # sanity check stuff
     if OPTIONS.test is None:
-        print("Please specify a test")
-        sys.exit(1)
+        error_exit("Please specify a test")
 
     if len(clients) == 0:
-        print("Please specify some clients")
-        sys.exit(1)
+        error_exit("Please specify some clients")
 
     # seeing as all clients are running the same test, we
     # only need one object to interact with them.
