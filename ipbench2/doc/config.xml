@@ -4,7 +4,7 @@
 	* More specific options override more generic options.  The most generic options
 	come from the command line; then your parent tags and finally the most 
 	specific options are inside your tags.
-	* In this example configuration file, the value given to each attribute is
+	* In this example configuration file, the value given to each xml attribute is
 	the name of the ipbench command line argument which that attribute will override,
 	if set.
 	* This example configuration file shows every attribute which may be defined and
