@@ -1,3 +1,3 @@
 debian/tmp/usr/bin/ipbench
-debian/tmp/usr/share/doc/ipbench/config.xml
+debian/tmp/usr/share/doc/ipbench/config.xml /usr/share/doc/ipbench-controller/
 debian/tmp/usr/share/man/man1/ipbench.1
