@@ -128,135 +128,97 @@ Show program's version number and exit.
 \fB\-h\fP|\fB\-\-help\fP
 Show help information.
 .SH "XML CONFIGURATION FILE"
-Using the --config argument to ipbench, you can provide settings for your benchmark run
+Using the \fB--config\fP argument to ipbench, you can provide settings for your ipbench session
 through an xml file instead of (or in addition to) command line arguments.
 .br
 More specific options override more general options. Command line arguments are the
-most general and settings in the xml will always take precedence. Where an option
+most general and settings in the xml will always take precedence over them. Where an option
 can be specified in multiple places in the xml, the most deeply nested instance
 of the option is the one that is used. Not all options need be specified in the xml,
 although some are required.
 .br
 The basic structure of an xml configuration file for ipbench should be as follows.
 Which command line arguments correspond to which xml attributes are indicated.
-.br
-<ipbench>
-.br
 
-	<!-- 
-.br
-		'test' tag
-.br
-		* name (required) : --test for all clients
-.br
-		* args : --test-args for all clients
-.br
-		* target : --test-target for all clients
-.br
-		* port : --test-port for all clients
-.br
-	-->
-.br
-	<test name="" args="" port="" target="" controller_args="">
-.br
+.LP
+.nf
+	<ipbench>
 
 		<!-- 
-.br
-			'client' tag
-.br
-			* hostname (required) : --client for this client
-.br
-			* port : --port for this client
-.br
-			* test_target : --test-target for this client
-.br
-			* test_port : --test-port for this client
-.br
-			* test_args : --test-args for this client
-.br
+			'test' tag
+			* name (required) : \fB--test\fP for all clients
+			* args : \fB--test-args\fP for all clients
+			* target : \fB--test-target\fP for all clients
+			* port : \fB--test-port\fP for all clients
 		-->
-.br
-		<client hostname="" port="" test_port="" test_args="" test_target=""/>
-.br
-	</test>
-.br
 
-	<!-- 
-.br
-		'target_test' tag
-.br
-		* name (required) : --target-test
-.br
-		* args : --target-test-args
-.br
-		* controller_args : --target-test-controller-args
-.br
-	-->
-.br
-	<target_test name="" args="" controller_args="">
-.br
+		<test name="" args="" port="" target="" controller_args="">
+
+			<!-- 
+				'client' tag
+				* hostname (required) : \fB--client\fP for this client
+				* port : \fB--port\fP for this client
+				* test_target : \fB--test-target\fP for this client
+				* test_port : \fB--test-port\fP for this client
+				* test_args : \fB--test-args\fP for this client
+			-->
+
+			<client hostname="" port="" test_port="" test_args="" test_target=""/>
+
+		</test>
 
 		<!-- 
-.br
-			'target' tag
-.br
-			* hostname (required) : --target-test-hostname
-.br
-			* port : --target-test-port
-.br
-			* test_args : --target-test-args
-.br
+			'target_test' tag
+			* name (required) : \fB--target-test\fP
+			* args : \fB--target-test-args\fP
+			* controller_args : \fB--target-test-controller-args\fP
 		-->
-.br
-		<target hostname="--target-test-hostname" port="--target-test-port" test_args="--target-test-args"/>
-.br
-	</target_test>
-.br
-</ipbench>
-.br
 
-For instance, below is an example of the same ipbench controller command, expressed first
-using command line arguments, and a second time using the xml format.
+		<target_test name="" args="" controller_args="">
+
+			<!-- 
+				'target' tag
+				* hostname (required) : \fB--target-test-hostname\fP
+				* port : \fB--target-test-port\fP
+				* test_args : \fB--target-test-args\fP
+			-->
+
+			<target hostname="--target-test-hostname" port="--target-test-port" test_args="--target-test-args"/>
+		</target_test>
+	</ipbench>
+.fi
+.LP
+
+For instance, below is an example of the same ipbench controller input expressed twice.
 .br
+The first case shows how the input could be given to ipbench as command line arguments.
 
 .HP
 .ad l
-\fBipbench\fP \fB-p\fP 8036 \fB--client\fP 10.13.0.4 \fB--client\fP 10.13.0.5 \fB--client\fP 10.13.0.6 \fB--client\fP 10.13.0.7 \fB--test-target\fP="172.16.1.1" \fB--test-port\fP=1235 \fB--test\fP="latency" \fB--test-args\fP="socktype=udp,bps=250000000,size=1472,warmup=0,cooldown=0,samples=50000" \fB--target-test\fP=cpu_target \fB--target-test-hostname\fP="172.16.1.1" \fB--target-test-port\fP=1236
+\fBipbench\fP \fB-p\fP 8036 \fB--client\fP 10.13.0.4 \fB--client\fP 10.13.0.5 \fB--client\fP 10.13.0.6 \fB--client\fP 10.13.0.7 \fB--test-target\fP=172.16.1.1 \fB--test-port\fP=1235 \fB--test\fP=latency \fB--test-args\fP="socktype=udp,bps=250000000,size=1472,warmup=0,cooldown=0,samples=50000" \fB--target-test\fP=cpu_target \fB--target-test-hostname\fP=172.16.1.1 \fB--target-test-port\fP=1236
 
-.ad
 .LP
-.br
-<ipbench>
-.br
+The second case shows the contents of an xml file which will produce the same configuration if passed to ipbench.
+.nf
 
-	<test name="latency"
-.br
-		args="socktype=udp,bps=250000000,size=1472,warmup=0,cooldown=0,samples=50000"
-.br
-		port="1235" target="172.16.1.1">
-.br
+	<ipbench>
 
-		<client hostname="10.13.0.4" port="8036"/>
-.br
-		<client hostname="10.13.0.5" port="8036"/>
-.br
-		<client hostname="10.13.0.6" port="8036"/>
-.br
-		<client hostname="10.13.0.7" port="8036"/>
-.br
+		<test name="latency"
+			args="socktype=udp,bps=250000000,size=1472,warmup=0,cooldown=0,samples=50000"
+			port="1235" target="172.16.1.1">
 
-	</test>
-.br
+			<client hostname="10.13.0.4" port="8036"/>
+			<client hostname="10.13.0.5" port="8036"/>
+			<client hostname="10.13.0.6" port="8036"/>
+			<client hostname="10.13.0.7" port="8036"/>
+		</test>
 
-	<target_test name="cpu_target">
-.br
-		<target hostname="172.16.1.1" port="1236"/>
-.br
-	</target_test>
-.br
-
-</ipbench>
-.br
+		<target_test name="cpu_target">
+			<target hostname="172.16.1.1" port="1236"/>
+		</target_test>
+	</ipbench>
+.fi
+.LP
 
 For more details on options in the xml configuration file, see the sample config.xml in the ipbench-controller package's documentation directory on your system.
 .SH "FILES"
