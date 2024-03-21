@@ -4,8 +4,6 @@ SUBDIRS=lib tests pymod
 
 AM_LDFLAGS=-Wl,--export-dynamic
 
-EXTRA_DIST=config.xml 
-
 #make sure these scripts get distributed
 dist_bin_SCRIPTS=ipbench ipbenchd
 
