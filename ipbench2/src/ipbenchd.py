@@ -19,7 +19,7 @@ HELP_TEXT = "\nHELP OPTIONS"           \
             "\nHELP"                   \
             "\nHELLO"                  \
             "\nLOAD"                   \
-            "\nSETUP target port args" \
+            "\nSETUP target::<test-target>||port::<test-port>||args::<test-args>" \
             "\nSTART"                  \
             "\nABORT"                  \
             "\nSTATUS"                 \
@@ -30,7 +30,7 @@ HELP_TEXT_TARGET = "\nHELP OPTIONS" \
                    "\nHELP"         \
                    "\nHELLO"        \
                    "\nLOAD"         \
-                   "\nSETUP args"   \
+                   "\nSETUP args::<target-test-args>"   \
                    "\nSTART"        \
                    "\nSTOP"         \
                    "\nABORT"        \
@@ -605,7 +605,7 @@ def main():
     parser.add_option("-i", "--ip", dest="ip",
                       help="Makes the daemon bind to the specified ip. Default is to bind to all available ip addresses.", type="string", default="", action="store")
     parser.add_option("-p", "--port", dest="port",
-                      help="Makes the daemon listen on the specified port. Default is 8036.", type="int", default=8036, action="store")
+                      help="Makes the daemon listen on the specified port. Default is 8036 for clients, 8037 for targets.", type="int", default=8036, action="store")
     parser.add_option("-d", "--debug", dest="debug", action="store_true",
                       help="Enable debugging; provide verbose output.", default=False)
     parser.add_option("-t", "--target", dest="target", action="store_true",

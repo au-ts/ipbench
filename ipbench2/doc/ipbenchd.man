@@ -42,6 +42,75 @@ Enable debugging; provide verbose output.
 .TP 
 \fB\-t\fP|\fB\-\-target\fR
 Put the daemon in target mode
+.SH "COMMUNICATING WITH IPBENCHD"
+.LP
+By sending messages to the port ipbenchd is listening on (e.g. using telnet) you
+can issue commands to ipbenchd. The available commands are listed here.
+
+.TP
+.B
+HELP
+.br
+Prints a list of all ipbenchd commands.
+.TP
+.B
+HELLO
+.br
+Prepare ipbenchd to run a new test.
+.TP
+.B
+LOAD <test-name>
+.br
+Specify which test will be run.
+.TP
+.B
+SETUP
+.br
+There are two versions of the setup command, based on whether ipbenchd is
+running in client mode or target mode. In client mode, SETUP must be run
+.LP
+\fBSETUP\fP target::<test-target>||port::<test-port>||args::<test-args>
+.br
+This passes the target, port on the target, and arguments for the
+test in question to use. In target mode, SETUP must be run
+.LP
+\fBSETUP\fP args::<target-test-args>
+.br
+Only the arguments to the target test are needed, since target
+tests do not involve other machines.
+.TP
+.B
+START
+.br
+Begins running the test which has been configured.
+.TP
+.B
+STOP
+.br
+Ends the currently running test. This command only exists in target mode;
+in client mode a test will finish based on performing certain tasks
+such as sending a specific number of packets to the target. But in target
+mode the test will simply keep running until ordered to stop with this command.
+.TP
+.B
+ABORT
+.br
+If ipbenchd is currently running a test, end the test immediately without
+processing data and return to ready state so another test can be configured and run.
+This command is useful if a previous test failed unexpectedly and ipbenchd
+has been left unable to accept new tests.
+.TP
+.B
+STATUS
+.br
+Show the status of ipbenchd.
+.TP
+.B
+QUIT
+.br
+Close the connection to ipbenchd.
+
+
 .SH "FILES"
 .LP 
 (none)
