@@ -47,58 +47,13 @@ Put the daemon in target mode
 By sending messages to the port ipbenchd is listening on (e.g. using telnet) you
 can issue commands to ipbenchd. The available commands are listed here.
 
+These first four commands can be issued at any time.
+
 .TP
 .B
 HELP
 .br
 Prints a list of all ipbenchd commands.
-.TP
-.B
-HELLO
-.br
-Prepare ipbenchd to run a new test.
-.TP
-.B
-LOAD <test-name>
-.br
-Specify which test will be run.
-.TP
-.B
-SETUP
-.br
-There are two versions of the setup command, based on whether ipbenchd is
-running in client mode or target mode. In client mode, SETUP must be run
-.LP
-\fBSETUP\fP target::<test-target>||port::<test-port>||args::<test-args>
-.br
-This passes the target, port on the target, and arguments for the
-test in question to use. In target mode, SETUP must be run
-.LP
-\fBSETUP\fP args::<target-test-args>
-.br
-Only the arguments to the target test are needed, since target
-tests do not involve other machines.
-.TP
-.B
-START
-.br
-Begins running the test which has been configured.
-.TP
-.B
-STOP
-.br
-Ends the currently running test. This command only exists in target mode;
-in client mode a test will finish based on performing certain tasks
-such as sending a specific number of packets to the target. But in target
-mode the test will simply keep running until ordered to stop with this command.
-.TP
-.B
-ABORT
-.br
-If ipbenchd is currently running a test, end the test immediately without
-processing data and return to ready state so another test can be configured and run.
-This command is useful if a previous test failed unexpectedly and ipbenchd
-has been left unable to accept new tests.
 .TP
 .B
 STATUS
@@ -109,7 +64,87 @@ Show the status of ipbenchd.
 QUIT
 .br
 Close the connection to ipbenchd.
+.TP
+.B
+ABORT
+.br
+If ipbenchd is currently running a test, end the test immediately without
+processing data and return to ready state so another test can be configured and run.
+Then close the connection to ipbenchd.
+This command is useful if a previous test failed unexpectedly and ipbenchd
+has been left unable to accept new tests.
+.LP
+These remaining commands 
+take ipbenchd through the process of preparing, running, and completing
+a test. Ipbenchd will only accept one of these commands if it has been brought
+to the correct state by successful runs of the previous commands in order.
+If not, a syntax error will be returned.
+.TP
+.B
+HELLO
+.br
+Prepare ipbenchd to run a new test. This command can only be run when ipbenchd
+is in its initial ready state and not running a test.
+.TP
+.B
+LOAD <test-name>
+.br
+Specify which test will be run. This command can only be run after HELLO.
+.TP
+.B
+SETUP
+.br
+Configure how the test will be run. This command can only be run after LOAD.
+There are two versions of the setup command, based on whether ipbenchd is
+running in client mode or target mode. In client mode, SETUP must be run as
+.br
 
+\fBSETUP\fP target::<test-target>||port::<test-port>||args::<test-args>
+.br
+
+This passes the target, port on the target, and arguments for the
+test in question to use. In target mode, SETUP must be run as
+.br
+
+\fBSETUP\fP args::<target-test-args>
+.br
+
+Only the arguments to the target test are needed, since target
+tests do not involve other machines.
+.TP
+.B
+START
+.br
+Begins running the test which has been configured. This command can only be run
+after SETUP.
+.TP
+.B
+STOP
+.br
+Ends the currently running test. This command can only be run after START, and
+only when ipbenchd is running in target mode.
+In client mode a test will finish based on completing certain tasks.
+In target mode a test will keep running until ordered to stop with this command.
+
+.LP
+Once one user sends HELLO to ipbenchd, no other users will be able to send
+test-related commands until the current test is completed or aborted.
+This will be displayed in STATUS output as "Running a test".
+.LP
+The state of which of HELLO, LOAD, SETUP, START, STOP should be run next
+is maintained in your connection to ipbenchd, not globally. If you disconnect
+from ipbenchd, you'll need to prepare your test again from the beginning.
+Ipbenchd won't remember what state you reached.
+.LP
+Outside of debugging, you should never need to run HELLO, LOAD, SETUP, START,
+or STOP manually. Use the ipbench controller program to handle running
+benchmarks, which will automatically issue these commands in the correct
+order with the correct syntax for you.
+.LP
+The main reason to manually connect to ipbenchd is to check STATUS
+or use ABORT to clean up from a benchmark run which failed unexpectedly.
+You can also configure ipbench to send ABORT to each client before running
+a test.
 
 .SH "FILES"
 .LP 
