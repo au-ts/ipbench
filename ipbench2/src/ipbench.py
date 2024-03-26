@@ -362,11 +362,11 @@ def main():
                       help="Arguments affecting how the target runs its test.", default="")
 
     parser.add_option("--test-controller-args", dest="controller_args", action="store", type="string",
-                      help="Arguments for the setup_controller function of the test running on the clients. See individual tests for details.",
+                      help="Arguments for the setup_controller function of the test running on the clients. No current ipbench test needs this argument.",
                       default=None)
 
     parser.add_option("--target-test-controller-args", dest="target_controller_args", action="store", type="string",
-                      help="Arguments for the setup_controller function of the test running on the target. See individual tests for details.",
+                      help="Arguments for the setup_controller function of the test running on the target. No current ipbench test needs this argument.",
                       default=None)
 
     parser.add_option("--config", dest="config", action="store",

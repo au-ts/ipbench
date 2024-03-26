@@ -117,13 +117,17 @@ tests it runs on itself.
 .TP 
 \fB\-\-test\-controller\-args\fP=<\fIargs\fP>
 This string is ultimately passed to the setup_controller function in the
-implementation of any test which runs on the clients. See each client-side test
-for what arguments are available.
+test being run by the clients. All tests currently available with ipbench
+either ignore the setup_controller function or accept only the arguments
+which are also later given during setup. This argument is therefore
+unneeded and may be ignored.
 .TP 
 \fB\-\-target\-test\-controller\-args\fP=<\fIargs\fP>
 This string is ultimately passed to the setup_controller function in the
-implementation of any test which runs on the target. See each target-side test
-for what arguments are available.
+test being run on the target. All tests currently available with ipbench
+either ignore the setup_controller function or accept only the arguments
+which are also later given during setup. This argument is therefore
+unneeded and may be ignored.
 .TP
 \fB\-\-config\fP=<\fIconfig\fP>
 Specify an input config file (XML based, see below).
