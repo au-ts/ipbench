@@ -11,7 +11,7 @@ import re
 import os
 import signal
 import mmap
-from optparse import OptionParser
+from argparse import ArgumentParser
 from traceback import print_exc
 
 HELP_TEXT = "\nHELP OPTIONS"           \
@@ -600,18 +600,18 @@ def main():
     ipbench daemon main function.
     """
     global OPTIONS, SERVER
-    usage = "usage: %prog [options]"
-    parser = OptionParser(usage, version="%prog 2.1.1")
-    parser.add_option("-i", "--ip", dest="ip",
-                      help="Makes the daemon bind to the specified ip. Default is to bind to all available ip addresses.", type="string", default="", action="store")
-    parser.add_option("-p", "--port", dest="port",
-                      help="Makes the daemon listen on the specified port. Default is 8036 for clients, 8037 for targets.", type="int", default=8036, action="store")
-    parser.add_option("-d", "--debug", dest="debug", action="store_true",
+    parser = ArgumentParser(description="ipbenchd can act as a client or a target in the ipbench benchmarking suite.")
+    parser.add_argument("--version", action="version", version="%(prog)s 2.1.1")
+    parser.add_argument("-i", "--ip", dest="ip",
+                      help="Makes the daemon bind to the specified ip. Default is to bind to all available ip addresses.", type=str, default="", action="store")
+    parser.add_argument("-p", "--port", dest="port",
+                      help="Makes the daemon listen on the specified port. Default is 8036 for clients, 8037 for targets.", type=int, default=8036, action="store")
+    parser.add_argument("-d", "--debug", dest="debug", action="store_true",
                       help="Enable debugging; provide verbose output.", default=False)
-    parser.add_option("-t", "--target", dest="target", action="store_true",
+    parser.add_argument("-t", "--target", dest="target", action="store_true",
                       help="Put the daemon in target mode.")
 
-    (OPTIONS, args) = parser.parse_args()
+    OPTIONS = parser.parse_args()
 
     if OPTIONS.target:
         OPTIONS.port = 8037
