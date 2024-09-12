@@ -226,7 +226,7 @@ class IpbenchTestClient:
         initial_content = buffer + self.socket.recv(128)
         clenline = copy(initial_content).decode('ascii', errors='ignore')
         newline = clenline.find('\n')
-        r = re.match("Content-length: (\d+)", clenline[:newline])
+        r = re.match(r"Content-length: (\d+)", clenline[:newline])
         if r.group(1) is None:
             raise IpBenchError("Invalid Content-length")
         content_length = int(r.group(1))
