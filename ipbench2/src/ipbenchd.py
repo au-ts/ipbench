@@ -219,7 +219,7 @@ class IpbenchClient:
         while (1):
             line_in = self.readline().strip()
 
-            cmd = re.match("\S*", line_in).group(0)
+            cmd = re.match(r"\S*", line_in).group(0)
             if cmd is None:
                 self.send(str_status(500))
                 continue
@@ -260,7 +260,7 @@ class IpbenchClient:
             if line_in == "QUIT":
                 return ("ERROR", (222, "Come back soon!"))
 
-            cmd = re.match("(\S+)", line_in)
+            cmd = re.match(r"(\S+)", line_in)
             if cmd is None:
                 self.send(str_status(500))
                 continue
@@ -291,7 +291,7 @@ class IpbenchClient:
             if line_in == "QUIT":
                 return ("ERROR", (222, "Come back soon!"))
 
-            rematch = re.match("(\w+) ([\s\w]+)", line_in)
+            rematch = re.match(r"(\w+) ([\s\w]+)", line_in)
             if rematch is None:
                 self.send(str_status(500))
                 continue
@@ -315,7 +315,7 @@ class IpbenchClient:
                             if line_in == "QUIT":
                                 return ("ERROR", (222, "Come back soon!"))
 
-                            rematch = re.match("(\w+) (..*)", line_in)
+                            rematch = re.match(r"(\w+) (..*)", line_in)
                             if rematch is None:
                                 self.send(str_status(500))
                                 continue
@@ -364,7 +364,7 @@ class IpbenchClient:
             if line_in == "QUIT":
                 return ("ERROR", (222, "Come back soon!"))
 
-            rematch = re.match("(\w+)", line_in)
+            rematch = re.match(r"(\w+)", line_in)
             if rematch is None:
                 self.send(str_status(500))
                 continue
@@ -472,7 +472,7 @@ class IpbenchTarget(IpbenchClient):
             if line_in == "QUIT":
                 return ("ERROR", (222, "Come back soon!"))
 
-            rematch = re.match("(\w+)", line_in)
+            rematch = re.match(r"(\w+)", line_in)
             if rematch is None:
                 self.send(str_status(500))
                 continue
@@ -503,7 +503,7 @@ class IpbenchTarget(IpbenchClient):
                             os._exit(0)
                         if line_in == "QUIT":
                             return ("ERROR", (222, "Come back soon!"))
-                        rematch = re.match("(\w+)", line_in)
+                        rematch = re.match(r"(\w+)", line_in)
                         if rematch is None:
                             self.send(str_status(500))
                             continue
