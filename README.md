@@ -21,12 +21,12 @@ The test suite has three main components:
 
 
 1. **A controller** : Your personal computer
-2. **n testers** : A "heavyweight" PC on which the test will run
+2. **n clients** : A "heavyweight" PC on which the test will run
 3. **A target** : depending on the test requires different capabilities.
 
-The general procedure is that you specify the test and the controller sets up and sychronously starts the tester machines running their test aimed at the target.  Once they have completed, they report their results back to the controller, which concatenates the results from all testers and reports a final tally.
+The general procedure is that you specify the test and the controller sets up and sychronously starts the client machines running their test aimed at the target.  Once they have completed, they report their results back to the controller, which concatenates the results from all clients and reports a final tally.
 
-Some tests have a companion component that runs on the target, such as a CPU usage monitor (the light grey lines above).  These are optional but work similar to the testing clients.
+Some tests have a companion component that runs on the target, such as a CPU usage monitor.  These are optional but work similar to the testing clients.
 
 ### Implementation
 
@@ -59,6 +59,7 @@ Peter Chubb
 
 ## Contributers
 
+Christopher Irving (documentation improvements)
 Matthew Rossouw (move to GitHub, QoL and 2.1)
 Ian Wienand (legacy)
 Luke Macpherson (legacy, CPU measurement systems)
