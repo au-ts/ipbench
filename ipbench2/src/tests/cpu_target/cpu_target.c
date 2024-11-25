@@ -152,7 +152,7 @@ static void itimer(int sig)
 	unsigned long long total_blp = 0;
 	unsigned long long blp_snapshot[N_CPUS];
 	static unsigned long long old_blp[N_CPUS];
-	char print_out [256];
+	char print_out [1024];
 	int i;
 
 	gettimeofday(&tv, 0);
@@ -181,10 +181,10 @@ static void itimer(int sig)
 			}
 			calibration_complete = 1;
 		}
-		sprintf(print_out, "Calibrating -- total: %llu loops/sec", total_blp);
+		snprintf(print_out, sizeof print_out,  "Calibrating -- total: %llu loops/sec", total_blp);
 		if (do_bonding) {
 			for(i = 0; i < nr_cpus; i++) {
-				sprintf(print_out + strlen(print_out), 
+                            snprintf(print_out + strlen(print_out), sizeof print_out - strlen(print_out),
 					" || CPU%d: %llu loops/sec", i, blp[i]);
 			}
 		}
@@ -455,15 +455,24 @@ int
 cpu_target_marshall(char **data, int *size, double running_time)
 {
 	static char buf[BUFSIZ];
+        char *bp;
 
 	double av = average_cpu();
 
 	snprintf(buf, BUFSIZ, "%.1f\n", av*100);
-
+        bp = buf;
 	dbprintf("Average CPU time is %5.1f%%.\n", av*100);
+        for (int i = 0; i < nr_cpus; i++) {
+            int len;
+            bp = strdup(bp);
+            snprintf(buf, BUFSIZ, ",CPU%d: %.1f", i, cpu_load[i]);
+            len = strlen(bp) + strlen(buf) + 1;
+            bp = realloc(bp, len);
+            strncat(bp, buf, len);
+        }
 
-	*data = buf;
-	*size = strlen(buf) + 1;
+	*data = bp;
+	*size = strlen(bp) + 1;
 
 	return 0;
 }

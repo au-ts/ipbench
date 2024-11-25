@@ -1,3 +1,9 @@
+ipbench (2.1.2) unstable; urgency=medium
+
+  * Unbitrot cpu_target; add per-processor output.
+
+ -- Peter Chubb <peterc@unsw.edu.au>  Mon, 25 Nov 2024 20:28:46 +1100
+
 ipbench (2.1.1) unstable; urgency=medium
 
   * Overhaul by Matthew Rossouw
