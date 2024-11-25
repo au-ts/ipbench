@@ -8,8 +8,8 @@ __pycache__/
 *.so
 *.o
 .libs/
-.lo
-.la
+*.lo
+*.la
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -78,4 +78,3 @@ ipbench2/counts_per_sec
 ipbench2/debian/autoreconf.after
 ipbench2/debian/autoreconf.before
 ipbench2/m4/
-
