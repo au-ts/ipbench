@@ -18,7 +18,7 @@ int ipbench_error(int code, char *msg)
 /*
    Wrapper around ipbench_error which also includes plugin name.
 */
-int ipbench_plugin_error(int code, char *msg, char *source) {
+int ipbench_plugin_error(int code, char *msg, const char *source) {
 	char buf[255];
 	snprintf(buf, 255, "%s: %s", msg, source);
 	return ipbench_error(code, buf);

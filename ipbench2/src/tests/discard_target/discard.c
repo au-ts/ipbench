@@ -204,7 +204,6 @@ generate_load(int sock)
 
 int discard_setup(char *hostname, int port, char *arg)
 {
-	int flag;
 	int fd;
 
 	dbprintf("discard setup begin (target %s [port %d]).\n", hostname, port);
@@ -240,14 +239,14 @@ int discard_stop(struct timeval *stop)
 	return 0;
 }
 
-int discard_marshal(void **data, size_t *size, double running_time)
+int discard_marshal(char **data, int *size, double running_time)
 {
 	struct discard_result *tosend;
 
 
 	tosend = malloc(sizeof *tosend);
 	if (tosend == NULL)
-		printf("Can't malloc %u bytes", sizeof *tosend);
+		printf("Can't malloc %lu bytes", sizeof *tosend);
 
 
 	tosend->size    = htonll(result.size);
@@ -259,13 +258,13 @@ int discard_marshal(void **data, size_t *size, double running_time)
 	tosend->eagains = htonll(result.eagains);
 	tosend->badsends = htonll(result.badsends);
 
-	*data = tosend;
+	*data = (char *)tosend;
 	*size = sizeof *tosend;
 
 	return 0;
 }
 
-void discard_marshal_cleanup(void **data)
+void discard_marshal_cleanup(char **data)
 {
 	free(*data);
 }
@@ -273,8 +272,8 @@ void discard_marshal_cleanup(void **data)
 /*
  * Run in ipbench
  */
-int discard_unmarshal(void *input, size_t input_len, void **data,
-		       size_t *data_len)
+int discard_unmarshal(char *input, int input_len, char **data,
+		       int *data_len)
 {
 	struct discard_result *result = (struct discard_result *)(input);
 	struct discard_result *theresult;
@@ -290,7 +289,7 @@ int discard_unmarshal(void *input, size_t input_len, void **data,
 	}
 
 	*data_len = sizeof(struct discard_result);
-	theresult = *data = malloc(*data_len);
+	*data = (char *)(theresult = malloc(*data_len));
 	if (*data == NULL)
 		printf("Out of buffer space.\n");
 
@@ -307,25 +306,26 @@ int discard_unmarshal(void *input, size_t input_len, void **data,
 	return 0;
 }
 
-void discard_unmarshal_cleanup(void **data)
+void discard_unmarshal_cleanup(char **data)
 {
 	free(*data);
 	*data = NULL;
 }
 
-int discard_output(struct client_data *target_data, struct client_data data[], int nelem)
+int discard_output(struct client_data *target_data, int nelem)
 {
 
-	int i = 0;
-	uint64_t total_requested_throughput = 0;
-	uint64_t total_sent_throughput = 0;
-	uint64_t packet_size = 0;
-	uint64_t totalbytes = 0;
-	uint64_t microseconds = 0;
-	struct discard_result *theresult;
+//	int i = 0;
+//	uint64_t total_requested_throughput = 0;
+//	uint64_t total_sent_throughput = 0;
+//	uint64_t packet_size = 0;
+//	uint64_t totalbytes = 0;
+//	uint64_t microseconds = 0;
+//	struct discard_result *theresult;
 
 	dbprintf("Discard begin output function\n");
 
+/*
 	for (i = 0; i < nelem; i++)
 	{
 		theresult = (struct discard_result *)(data[i].data);
@@ -354,6 +354,7 @@ int discard_output(struct client_data *target_data, struct client_data data[], i
 #endif
 	printf("%lu,%lu,%lu",
 	       total_requested_throughput, total_sent_throughput, packet_size);
+*/
 	if (target_data != NULL) {
 		printf(",%s", (char*)target_data->data);
 	}
