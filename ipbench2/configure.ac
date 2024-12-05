@@ -4,6 +4,31 @@ AC_INIT([ipbench],[2.1.1])
 AC_CONFIG_MACRO_DIRS([m4])
 
 AC_CONFIG_SRCDIR(src/ipbench.py)
+# Cross-compile
+AC_CANONICAL_BUILD
+AC_CANONICAL_HOST
+AC_CANONICAL_TARGET
+
+# Check host OS
+AS_CASE([$host_os],
+  [linux*], [HOST_OS=linux],
+  [*bsd*],  [HOST_OS=bsd],
+  [AC_MSG_ERROR([Unsupported host system: $host_os])])
+AC_SUBST([HOST_OS])
+
+# Check for cross-compilation tools
+AC_ARG_WITH([cross-prefix],
+  [AS_HELP_STRING([--with-cross-prefix=PREFIX],
+    [prefix for cross-compilation tools])],
+  [CROSS_COMPILE=$withval])
+
+AS_IF([test "x$CROSS_COMPILE" != "x"],
+  [AC_SUBST([CC], ["${CROSS_COMPILE}gcc"])
+   AC_SUBST([CXX], ["${CROSS_COMPILE}g++"])
+   AC_SUBST([AR], ["${CROSS_COMPILE}ar"])
+   AC_SUBST([RANLIB], ["${CROSS_COMPILE}ranlib"])
+   AC_SUBST([STRIP], ["${CROSS_COMPILE}strip"])])
+
 
 AM_INIT_AUTOMAKE([foreign])
 AC_DISABLE_STATIC
@@ -13,6 +38,8 @@ LT_INIT(dlopen)
 AC_PROG_SWIG(4.0.0)
 AM_PATH_PYTHON([3.9])
 SWIG_PYTHON
+
+
 
 AC_CONFIG_HEADERS(src/config.h)
 
