@@ -60,7 +60,7 @@ Peter Chubb
 ## Contributers
 
 Christopher Irving (documentation improvements)
-Matthew Rossouw (move to GitHub, QoL and 2.1)
+Lesley Rossouw (move to GitHub, QoL and 2.1)
 Ian Wienand (legacy)
 Luke Macpherson (legacy, CPU measurement systems)
 
