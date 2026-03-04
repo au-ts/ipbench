@@ -71,9 +71,9 @@ configure
 debhelper-build-stamp
 .dirstamp
 *.deb
-ipbench_2.1.1_amd64.build
-ipbench_2.1.1_amd64.buildinfo
-ipbench_2.1.1_amd64.changes
+ipbench_*_amd64.build
+ipbench_*_amd64.buildinfo
+ipbench_*_amd64.changes
 ipbench2/counts_per_sec
 ipbench2/debian/autoreconf.after
 ipbench2/debian/autoreconf.before
