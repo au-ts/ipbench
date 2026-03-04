@@ -1,7 +1,7 @@
 Source: ipbench
 Section: net
 Priority: optional
-Maintainer: peter.chubb@unsw.edu.au
+Maintainer: Peter Chubb <peter.chubb@unsw.edu.au>
 Standards-Version: 4.0.0
 Build-Depends:  debhelper-compat (= 13), swig (>= 4.0.0), python3-dev
 
@@ -53,13 +53,6 @@ Description: Development files for ipbench2
  a easily extended API for writing new ones.  More information can be
  found at http://ipbench.sf.net
  This package includes headers required to build ipbench plugins.
-
-Package: ipbench-docs
-Architecture: all
-Description: Documentation for ipbench2
- ipbench is a distributed networking suite with a variety of tests and
- a easily extended API for writing new ones.  More information can be
- found at http://ipbench.sf.net
 
 Package: ipbench-controller
 Architecture: all

@@ -470,7 +470,7 @@ static int parse_arg(char *arg)
 
 int latency_setup(char *hostname, int port, char *arg)
 {
-	dbprintf("Latency setup begin (target %s [port %d]).\n", hostname, port);
+	dbprintf("Latency-check setup begin (target %s [port %d]).\n", hostname, port);
 	if (strlen(arg) != 0)
 		if (parse_arg(arg))
 			return -1;

@@ -495,8 +495,7 @@ int nfsstone_run(struct timeval *start, struct timeval *end_time)
 	return error;
 }
 
-int do_child(dir)
-	char *dir;
+int do_child(char *dir)
 {
 	int i, fd, cfd;
 	long j;
@@ -633,8 +632,7 @@ int do_child(dir)
 /*
  * Write a file descriptor sequentially
  */
-int seq_write(fd)
-	int fd;
+int seq_write(int fd)
 {
 	long j;
 
@@ -659,8 +657,7 @@ int seq_write(fd)
 	return OK;
 }
 
-int seq_read(fd)
-	int fd;
+int seq_read(int fd)
 {
 	long j;
 
@@ -686,8 +683,7 @@ int seq_read(fd)
 	return OK;
 }
 
-int nseq_read(fd)
-	int fd;
+int nseq_read(int fd)
 {
 	long j;
 

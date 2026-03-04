@@ -1,8 +1,15 @@
+ipbench (2.1.3) unstable; urgency=medium
+
+  * Make latency_check have a different name from latency
+  * Update to automake 1.18, autoconf 2.72
+
+ -- Peter Chubb <peter.chubb@unsw.edu.au>  Wed, 04 Mar 2026 14:00:44 +1100
+
 ipbench (2.1.2) unstable; urgency=medium
 
   * Unbitrot cpu_target; add per-processor output.
 
- -- Peter Chubb <peterc@unsw.edu.au>  Mon, 25 Nov 2024 20:28:46 +1100
+ -- Peter Chubb <peter.chubb@unsw.edu.au>  Mon, 25 Nov 2024 20:28:46 +1100
 
 ipbench (2.1.1) unstable; urgency=medium
 

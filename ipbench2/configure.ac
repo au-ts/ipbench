@@ -1,6 +1,6 @@
-AC_PREREQ([2.69])
+AC_PREREQ([2.72])
 
-AC_INIT([ipbench],[2.1.1])
+AC_INIT([ipbench],[2.1.3])
 AC_CONFIG_MACRO_DIRS([m4])
 
 AC_CONFIG_SRCDIR(src/ipbench.py)
@@ -35,9 +35,9 @@ AC_DISABLE_STATIC
 
 LT_INIT(dlopen)
 
-AC_PROG_SWIG(4.0.0)
+AX_PKG_SWIG(4.1.1, [], [])
 AM_PATH_PYTHON([3.9])
-SWIG_PYTHON
+AX_SWIG_PYTHON
 
 
 

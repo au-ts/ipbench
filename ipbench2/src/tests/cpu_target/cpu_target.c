@@ -276,16 +276,19 @@ static void prep_cyclesoak(void)
 
 	for (cpu = 0; cpu < nr_cpus; cpu++) {
 		if ((kids[cpu]=fork()) == 0) {
-			if (setpriority(PRIO_PROCESS, getpid(), 40)) {	/* As low as as we can go */
-				perror("setpriority");
-				exit(1);
-			}
-			if (do_bonding) {
-				CPU_ZERO(&cpu_set);
-				CPU_SET(cpu, &cpu_set);
-				sched_setaffinity(kids[cpu], sizeof(cpu_set), &cpu_set);
-			}
-			busyloop(cpu);
+                    struct sched_param sp;
+                    sp.sched_priority = 0;
+
+                    if (do_bonding) {
+                        CPU_ZERO(&cpu_set);
+                        CPU_SET(cpu, &cpu_set);
+                        sched_setaffinity(kids[cpu], sizeof(cpu_set), &cpu_set);
+                    }
+                    if (sched_setscheduler(0, SCHED_IDLE, &sp)) {
+                        perror("attempt to set to IDLE prio");
+                        exit(1);
+                    }
+                    busyloop(cpu);
 		}
 
 	}
@@ -459,13 +462,13 @@ cpu_target_marshall(char **data, int *size, double running_time)
 
 	double av = average_cpu();
 
-	snprintf(buf, BUFSIZ, "%.1f\n", av*100);
+	snprintf(buf, BUFSIZ, "%.1f", av*100);
         bp = buf;
 	dbprintf("Average CPU time is %5.1f%%.\n", av*100);
         for (int i = 0; i < nr_cpus; i++) {
             int len;
             bp = strdup(bp);
-            snprintf(buf, BUFSIZ, ",CPU%d: %.1f", i, cpu_load[i]);
+            snprintf(buf, BUFSIZ, ",CPU%d: %.1f", i, cpu_load[i]*100);
             len = strlen(bp) + strlen(buf) + 1;
             bp = realloc(bp, len);
             strncat(bp, buf, len);
