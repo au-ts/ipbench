@@ -291,7 +291,7 @@ class IpbenchClient:
             if line_in == "QUIT":
                 return ("ERROR", (222, "Come back soon!"))
 
-            rematch = re.match(r"(\w+) ([\s\w]+)", line_in)
+            rematch = re.match(r"(\w+) ([\s\w-]+)", line_in)
             if rematch is None:
                 self.send(str_status(500))
                 continue
