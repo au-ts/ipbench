@@ -245,7 +245,7 @@ int unmarshall(int clientid, char *data, int len, int valid)
 	int sts;
 	char *ret_data;
 	dbprintf("[unmarshall] data for client %d \"%s\" [len %d] [%s]\n", 
-		 clientid, data, len, valid ? "invalid" : "valid");
+		 clientid, data, len, valid ? "valid" : "invalid");
 	
 	sts = ipbench_plugin->unmarshall(data, len, &ret_data,
 					 &client_data[clientid].size);
@@ -261,7 +261,7 @@ int unmarshall(char *data, int len, int valid)
 	int sts;
 	char *ret_data;
 	dbprintf("[unmarshall] data for target \"%s\" [len %d] [%s]\n", 
-		 data, len, valid ? "invalid" : "valid");
+		 data, len, valid ? "valid" : "invalid");
 	sts = ipbench_plugin->unmarshall(data, len, &ret_data, &target_data.size);
 	target_data.data = ret_data;
 	target_data.valid = valid;
