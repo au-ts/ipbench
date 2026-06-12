@@ -1,15 +1,11 @@
 /* Wrappers for ipbench API
  *  Ian Wienand <ianw@gelato.unsw.edu.au>
- *  (C) 2004 
+ *  (C) 2004
  *  Released under the GPL
  *
  * This file, and the related ipbench.i swing input file, describe the
  * shunt library that interfaces between test plugins (shared objects)
  * and the python based daemons.
- * 
- * Tidied up for 2.1. Added more descriptive error messages, cleaned up style.
- * Matt Rossouw <matthew.rossouw@unsw.edu.au> 2023
- *
  */
 
 #include <dlfcn.h>
@@ -125,7 +121,7 @@ int load_plugin(const char *plugin_name)
                         }
 
 			dbprintf("Checking test name |%s|%s|...\n", plugin_name, p->name);
-			if ( (strlen(plugin_name) != strlen(p->name)) || 
+			if ( (strlen(plugin_name) != strlen(p->name)) ||
 			     (strcmp(plugin_name, p->name) != 0))
 			{
 				dbprintf("%s does not match %s\n", plugin_name, p->name);
@@ -224,9 +220,9 @@ int marshall(char **marshalled_data, int *marshalled_data_size)
 	int sts;
 	char *ret_data;
 	sts = ipbench_plugin->marshall(&ret_data, marshalled_data_size, run_secs);
-	dbprintf("[marshall] plugin marshall return code %d [len %d]\n", 
+	dbprintf("[marshall] plugin marshall return code %d [len %d]\n",
 		 sts, *marshalled_data_size);
-	
+
 	*marshalled_data = ret_data;
 
 	if (sts != 0) {
@@ -244,9 +240,9 @@ int unmarshall(int clientid, char *data, int len, int valid)
 {
 	int sts;
 	char *ret_data;
-	dbprintf("[unmarshall] data for client %d \"%s\" [len %d] [%s]\n", 
+	dbprintf("[unmarshall] data for client %d \"%s\" [len %d] [%s]\n",
 		 clientid, data, len, valid ? "valid" : "invalid");
-	
+
 	sts = ipbench_plugin->unmarshall(data, len, &ret_data,
 					 &client_data[clientid].size);
 	client_data[clientid].data = ret_data;
@@ -260,7 +256,7 @@ int unmarshall(char *data, int len, int valid)
 {
 	int sts;
 	char *ret_data;
-	dbprintf("[unmarshall] data for target \"%s\" [len %d] [%s]\n", 
+	dbprintf("[unmarshall] data for target \"%s\" [len %d] [%s]\n",
 		 data, len, valid ? "valid" : "invalid");
 	sts = ipbench_plugin->unmarshall(data, len, &ret_data, &target_data.size);
 	target_data.data = ret_data;

@@ -1,6 +1,6 @@
-.TH "ipbench" "1" "Mar 2024" "Ian Wienand, Matthew Rossouw, Peter Chubb, Christopher Irving" "ipbench"
+.TH "ipbench" "1" "Mar 2024" "Ian Wienand, Lesley Rossouw, Peter Chubb, Christopher Irving" "ipbench"
 .SH "NAME"
-.LP 
+.LP
 ipbench \- Control an ipbench session
 .SH "SYNTAX"
 .HP
@@ -43,7 +43,7 @@ ipbench [\fB\-h\fP|\fB\-\-help\fP]
 .HP
 ipbench \fB\-\-version\fP
 .SH "DESCRIPTION"
-.LP 
+.LP
 The ipbench network benchmarking suite consists of three main components.
 .LP
 - A 'target' program running on the machine under study
@@ -77,7 +77,7 @@ on each client.
 .TP
 \fB\-t\fP <\fItest\fP>|\fB\-\-test\fP=<\fItest\fP>
 Name of test which the clients will all load and run.
-.TP 
+.TP
 \fB\-a\fP <\fIargs\fP>|\fB\-\-test\-args\fP=<\fIargs\fP>
 Arguments which will be provided to each client, affecting how they
 perform their test.
@@ -86,11 +86,11 @@ perform their test.
 Sends an ABORT message to each client from the controller, causing the
 connection to close and reopen, each time the controller sets up for a test.
 This might be useful if a test fails to complete properly.
-.TP 
+.TP
 \fB\-T\fP <\fIhostname\fP>|\fB\-\-test\-target\fP=<\fIhostname\fP>
 Hostname or IP address of the target machine that the clients will use to
 communicate with the target and perform their tests.
-.TP 
+.TP
 \fB\-P\fP <\fIport\fP>|\fB\-\-test\-port\fP=<\fIport\fP>
 Port on the target machine that the clients will use to communicate with the
 target and perform their tests.
@@ -100,26 +100,26 @@ The target daemon can be ipbenchd in target mode, or another program.
 \fB\-\-target\-test\-hostname\fP=<\fIhostname\fP>
 Hostname or IP address of the target machine that the controller will use to
 communicate with the target.
-.TP 
+.TP
 \fB\-\-target\-test\-port\fP=<\fIport\fP>
 Port on the target machine that the controller will use to communicate with
 the target and instruct it to run tests.
 The target needs to be listening on this port.
 The target daemon can be ipbenchd in target mode, or another program.
-.TP 
+.TP
 \fB\-\-target\-test\fP=<\fItarget-test\fP>
 Name of test which the target will load and run. This allows monitoring aspects
 of the target system while the clients test its network performance.
-.TP 
+.TP
 \fB\-\-target\-test\-args\fP=<\fIargs\fP>
 Arguments which will be provided to the target, affecting how it performs any
 tests it runs on itself.
-.TP 
+.TP
 \fB\-\-test\-controller\-args\fP=<\fIargs\fP>
 This string is ultimately passed to the setup_controller function in the
 implementation of any test which runs on the clients. See each client-side test
 for what arguments are available.
-.TP 
+.TP
 \fB\-\-target\-test\-controller\-args\fP=<\fIargs\fP>
 This string is ultimately passed to the setup_controller function in the
 implementation of any test which runs on the target. See each target-side test
@@ -129,13 +129,13 @@ for what arguments are available.
 Specify an input config file (XML based, see below).
 This allows you to provide ipbench options with more flexibility
 than the command line.
-.TP 
+.TP
 \fB\-d\fP|\fB--debug\fP
 Enable debugging; verbose output.
-.TP 
+.TP
 \fB\-\-version\fP
 Show program's version number and exit.
-.TP 
+.TP
 \fB\-h\fP|\fB\-\-help\fP
 Show help information.
 .SH "XML CONFIGURATION FILE"
@@ -155,7 +155,7 @@ Which command line arguments correspond to which xml attributes are indicated.
 .nf
 	<ipbench>
 
-		<!-- 
+		<!--
 			'test' tag
 			* name (required) : \fB--test\fP for all clients
 			* args : \fB--test-args\fP for all clients
@@ -165,7 +165,7 @@ Which command line arguments correspond to which xml attributes are indicated.
 
 		<test name="" args="" port="" target="" controller_args="">
 
-			<!-- 
+			<!--
 				'client' tag
 				* hostname (required) : \fB--client\fP for this client
 				* port : \fB--port\fP for this client
@@ -178,7 +178,7 @@ Which command line arguments correspond to which xml attributes are indicated.
 
 		</test>
 
-		<!-- 
+		<!--
 			'target_test' tag
 			* name (required) : \fB--target-test\fP
 			* args : \fB--target-test-args\fP
@@ -187,7 +187,7 @@ Which command line arguments correspond to which xml attributes are indicated.
 
 		<target_test name="" args="" controller_args="">
 
-			<!-- 
+			<!--
 				'target' tag
 				* hostname (required) : \fB--target-test-hostname\fP
 				* port : \fB--target-test-port\fP
@@ -233,23 +233,23 @@ The second case shows the contents of an xml file which will produce the same co
 
 For more details on options in the xml configuration file, see the sample config.xml in the ipbench-controller package's documentation directory on your system.
 .SH "FILES"
-.LP 
+.LP
 (none)
 .SH "ENVIRONMENT VARIABLES"
-.LP 
+.LP
 (none)
 .SH "EXAMPLES"
-.LP 
+.LP
 examples
 .SH "AUTHORS"
-.LP 
+.LP
 ipbench by Ian Wienand <ianw@gelato.unsw.edu.au>,
 .br
-Matthew Rossouw <matthew.rossouw@unsw.edu.au>,
+Lesley Rossouw <lesley.rossouw@unsw.edu.au>,
 .br
 Peter Chubb <peter.chubb@unsw.edu.au>.
 .br
 Man page by Christopher Irving <c.irving@unsw.edu.au>.
 .SH "SEE ALSO"
-.LP 
+.LP
 ipbenchd(1)
