@@ -1,9 +1,9 @@
-.TH "ipbenchd" "1" "Mar 2024" "Ian Wienand, Matthew Rossouw, Peter Chubb, Christopher Irving" ""
+.TH "ipbenchd" "1" "Mar 2024" "Ian Wienand, Lesley Rossouw, Peter Chubb, Christopher Irving" ""
 .SH "NAME"
-.LP 
+.LP
 ipbenchd \- Client daemon for the ipbench testing suite
 .SH "SYNTAX"
-.LP 
+.LP
 ipbenchd [\fB\-i\fR <\fIip\fP>|\fB\-\-ip\fP=<\fIip\fP>]
 [\fB\-p\fR <\fIport\fP>|\fB\-\-port\fP=<\fIport\fP>]
 [\fB\-t\fP|\fB\-\-target\fP] [\fB\-d\fP|\fB\-\-debug\fP]
@@ -12,7 +12,7 @@ ipbenchd \fB\-h\fP|\fB\-\-help\fR
 .br
 ipbenchd \fB\-\-version\fP
 .SH "DESCRIPTION"
-.LP 
+.LP
 This program is the client portion of the ipbench testing suite.  Each client must be running this daemon to receive commands from the controlling node. The daemon must be run as root to allow access to ports. It also does not fork into a separate process automatically. So you may want to run something like
 .LP
 .B sudo /usr/bin/ipbenchd &
@@ -23,23 +23,23 @@ This daemon can also be used as the target portion of the testing suite, by runn
 .LP
 For more on the structure of the ipbench testing suite, see the man page for ipbench(1)
 .SH "OPTIONS"
-.LP 
-.TP 
+.LP
+.TP
 \fB\-\-version\fR
 Show the program's version number and exit.
-.TP 
+.TP
 \fB\-h\fP|\fB\-\-help\fR
 Output help information.
-.TP 
+.TP
 \fB\-i\fR <\fIip\fP>|\fB\-\-ip\fP=<\fIip\fP>
 Makes the daemon bind to the specified \fIip\fP. Default is to bind to all available ip addresses.
-.TP 
+.TP
 \fB\-p\fR <\fIport\fP>|\fB\-\-port\fP=<\fIport\fP>
 Makes the daemon listen on the specified \fIport\fP.
-.TP 
+.TP
 \fB\-d\fP|\fB\-\-debug\fR
 Enable debugging; provide verbose output.
-.TP 
+.TP
 \fB\-t\fP|\fB\-\-target\fR
 Put the daemon in target mode
 .SH "COMMUNICATING WITH IPBENCHD"
@@ -74,7 +74,7 @@ Then close the connection to ipbenchd.
 This command is useful if a previous test failed unexpectedly and ipbenchd
 has been left unable to accept new tests.
 .LP
-These remaining commands 
+These remaining commands
 take ipbenchd through the process of preparing, running, and completing
 a test. Ipbenchd will only accept one of these commands if it has been brought
 to the correct state by successful runs of the previous commands in order.
@@ -147,23 +147,23 @@ You can also configure ipbench to send ABORT to each client before running
 a test.
 
 .SH "FILES"
-.LP 
+.LP
 (none)
 .SH "ENVIRONMENT VARIABLES"
-.LP 
+.LP
 (none)
 .SH "EXAMPLES"
-.LP 
+.LP
 examples
 .SH "AUTHORS"
-.LP 
+.LP
 ipbenchd by Ian Wienand <ianw@gelato.unsw.edu.au>,
 .br
-Matthew Rossouw <matthew.rossouw@unsw.edu.au>,
+Lesley Rossouw <lesley.rossouw@unsw.edu.au>,
 .br
 Peter Chubb <peter.chubb@unsw.edu.au>.
 .br
 Man page by Christopher Irving <c.irving@unsw.edu.au>.
 .SH "SEE ALSO"
-.LP 
+.LP
 ipbench(1)

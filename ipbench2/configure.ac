@@ -50,7 +50,7 @@ AC_ARG_ENABLE(debug,
   fi)
 
 #These test directories will be built by default
-ipbench_tests="wait latency latency-check  dummy cpu_target nfsstone wrapper cpu_target_lukem nfs_latency discard_target"
+ipbench_tests="wait latency latency-check  dummy cpu_target nfsstone wrapper cpu_target_lukem nfs_latency discard_target iperf3_cpu_target"
 
 AC_ARG_ENABLE([tests],
 [  --enable-tests=TESTS		tests directories to build (comma separated, default is all tests)],
@@ -98,7 +98,7 @@ AC_MSG_RESULT(yes)
 
 dnl Checks for our network access type.
 ipbench_raw_type=
-AC_CHECK_HEADER(netpacket/packet.h, [ipbench_raw_type=linux])	
+AC_CHECK_HEADER(netpacket/packet.h, [ipbench_raw_type=linux])
 if test x$ipbench_raw_type = x; then
   AC_CHECK_HEADER(net/bpf.h, [ipbench_raw_type=bpf])
 fi
@@ -135,11 +135,11 @@ case x$ipbench_raw_type in
 xbpf)
 	AC_MSG_WARN([Configuring latency test without raw sockets; we dont support BPF raw sockets, yet!])
 	AC_DEFINE(CONFIG_RAW_BPF, 1, [Have RAW Config])
-	;;		     
+	;;
 xlinux)
 	AC_MSG_RESULT([Configuring latency test with Linux RAW socket support])
 	AC_DEFINE(CONFIG_RAW_LINUX, 1, [Have RAW Config])
-	;;	
+	;;
 *)
 	AC_MSG_WARN([Configuring latency test without raw socket support]);
 	;;
@@ -169,6 +169,7 @@ AC_CONFIG_FILES([Makefile \
 		    src/tests/wrapper/Makefile \
 		    src/tests/cpu_target_lukem/Makefile \
 		    src/tests/nfs_latency/Makefile \
+		    src/tests/iperf3_cpu_target/Makefile \
 		    doc/Makefile \
 		    doc/manual/Makefile])
 AC_OUTPUT
