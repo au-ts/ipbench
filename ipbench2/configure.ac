@@ -50,7 +50,7 @@ AC_ARG_ENABLE(debug,
   fi)
 
 #These test directories will be built by default
-ipbench_tests="wait latency latency-check  dummy cpu_target nfsstone wrapper cpu_target_lukem nfs_latency discard_target iperf3_cpu_target"
+ipbench_tests="wait latency latency-check  dummy cpu_target nfsstone wrapper cpu_target_lukem nfs_latency discard_target iperf3_cpu_target cputarget_run_echo"
 
 AC_ARG_ENABLE([tests],
 [  --enable-tests=TESTS		tests directories to build (comma separated, default is all tests)],
@@ -170,6 +170,7 @@ AC_CONFIG_FILES([Makefile \
 		    src/tests/cpu_target_lukem/Makefile \
 		    src/tests/nfs_latency/Makefile \
 		    src/tests/iperf3_cpu_target/Makefile \
+		    src/tests/cputarget_run_echo/Makefile \
 		    doc/Makefile \
 		    doc/manual/Makefile])
 AC_OUTPUT
