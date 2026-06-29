@@ -25,5 +25,9 @@ extern double         *cpu_load;
 extern long int        cpu_samples;
 extern pid_t           cpu_target_kids[N_CPUS];
 
+/* Calibration state - these are defined in cpu_target.c */
+extern int             do_calibrate;
+extern unsigned int    calibration_complete;
+
 #endif /* CPU_TARGET_H */
 

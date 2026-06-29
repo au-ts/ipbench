@@ -24,9 +24,7 @@ extern void dbprintf (const char *, ...);
 extern int do_debug;
 
 static int              debug;
-static int              do_calibrate = 0;
-static int              calibrate_state = 0;
-static unsigned int     calibration_complete = 0;
+
 static struct timeval   alarm_time;
 static unsigned long    calibrated_loops_per_sec[N_CPUS];
 static unsigned long    counts_per_sec[N_CPUS];
@@ -49,6 +47,8 @@ int                     cooldown_time;
 double                 *cpu_load = NULL;
 long int                cpu_samples = 0;
 int                     running = 1;
+int                     do_calibrate = 0;
+unsigned int            calibration_complete = 0;
 
 static int              n_samples;
 static long int         warmup_samples = 0;
@@ -114,14 +114,14 @@ static void busyloop(int instance)
 
                 rw++;
                 if (rw == rw_ratio) {
-                        busyloop_buf[idx]++;                    /* Dirty a cacheline */
+                        busyloop_buf[idx]++;
                         rw = 0;
                 } else {
                         sum += busyloop_buf[idx];
                 }
 
                 for (thumb = 0; thumb < twiddle; thumb++)
-                        ;                               /* twiddle */
+                        ;
 
                 busyloop_progress[instance * CACHE_LINE_SIZE]++;
 
@@ -141,11 +141,12 @@ static void itimer(int sig)
         static unsigned long long old_blp[N_CPUS];
         char print_out[1024];
         int i;
+        static int calibrate_state = 0;
 
         gettimeofday(&tv, 0);
         delta = (tv.tv_sec - alarm_time.tv_sec) * 1000000;
         delta += tv.tv_usec - alarm_time.tv_usec;
-        delta /= 1000;          /* Milliseconds */
+        delta /= 1000;
 
         for (i = 0; i < nr_cpus; i++) {
                 blp_snapshot[i] = busyloop_progress[i * CACHE_LINE_SIZE];
