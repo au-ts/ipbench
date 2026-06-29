@@ -13,6 +13,7 @@ import signal
 import mmap
 from argparse import ArgumentParser
 from traceback import print_exc
+from time import sleep
 
 HELP_TEXT = "\nHELP OPTIONS"           \
             "\n------------"           \
@@ -624,10 +625,14 @@ def main():
     dbprint("[main] listening on port " +
             repr(OPTIONS.port) + " [" + repr(os.getpid()) + "]")
 
-    try:
-        SERVER.serve_forever()
-    except:
-        dbprint("[main] caught exception from serve_forever()")
+    while True:
+        try:
+            SERVER.serve_forever()
+        except Exception as e:
+            dbprint("[main] exception from serve_forever()!")
+            print(f"Exception in serve_forever: {e}")
+            print(f"Restarting server in 3 seconds...")
+            sleep(3)
 
 
 if __name__ == "__main__":
