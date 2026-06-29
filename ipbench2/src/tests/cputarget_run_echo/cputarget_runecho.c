@@ -13,14 +13,14 @@
 #include "cpu_target.h"
 
 #define MAX_PATH_LEN (4096)
-#define MAX_CMD_LEN (16384)  // Larger buffer for command line
+#define MAX_CMD_LEN (16384)
 
 static int fancy_output = 0;
 static int num_threads = 1;
 static int start_port = 5201;
 static pid_t server_pid = 0;
 static int num_samples;
-static int do_calibrate;
+static int period_secs = 1;
 static char exec_path[MAX_PATH_LEN] = "";
 static char server_flags[MAX_PATH_LEN] = "";
 
@@ -42,7 +42,6 @@ static int launch_server(void)
         }
 
         if (server_pid == 0) {
-                /* Child process - exec the echo server */
                 ret = snprintf(cmd, sizeof(cmd), "%s -p %d -P %d %s",
                               exec_path, start_port, num_threads, server_flags);
 
@@ -54,7 +53,6 @@ static int launch_server(void)
                 dbprintf("Launching server: %s\n", cmd);
                 execl("/bin/sh", "sh", "-c", cmd, NULL);
 
-                /* If execl returns, it failed */
                 dbprintf("execl failed: %s\n", strerror(errno));
                 exit(EXIT_FAILURE);
         }
@@ -62,7 +60,6 @@ static int launch_server(void)
         dbprintf("Launched server with PID %d (port %d, threads %d)\n",
                  server_pid, start_port, num_threads);
 
-        /* Give server a moment to start */
         usleep(500000);
 
         return 0;
@@ -87,13 +84,11 @@ static void cleanup_server(void)
         server_pid = 0;
 }
 
-static int parse_arg(char *arg)
+/* Parse echo server arguments only - cpu_target args handled separately */
+static int parse_echo_args(char *arg)
 {
         char *c, *cmd, *val;
         char *arg_ptr = NULL, *cmd_ptr = NULL;
-
-        if (cpu_target_parse_arg(arg))
-                return -1;
 
         if (strlen(arg) == 0)
                 return 0;
@@ -144,16 +139,25 @@ int cpu_target_setup(char *arg)
 
         dbprintf("Setup test.\n");
 
-        if (strlen(arg) != 0)
-                if (parse_arg(arg))
+        if (strlen(arg) != 0) {
+                /* Parse CPU target args (warmup, cooldown, cpus, etc) */
+                if (cpu_target_parse_arg(arg))
                         return -1;
+
+                /* Parse echo server specific args (need fresh copy - make a temp copy for parsing) */
+                char *arg_copy = strdup(arg);
+                if (parse_echo_args(arg_copy))
+                        return -1;
+                free(arg_copy);
+        }
 
         nr_cpus = cpu_target_count_cpus();
         if (nr_cpus < 0)
                 return -1;
 
+        /* Match original calculation: (2 * ((cooldown_time + 1) / period_secs)) */
         if (cooldown_time)
-                num_samples = (2 * ((cooldown_time + 1)));
+                num_samples = (2 * ((cooldown_time + 1) / period_secs));
         else
                 num_samples = 3600;
         dbprintf("Averaging (up to) %d samples\n", num_samples);
@@ -162,7 +166,7 @@ int cpu_target_setup(char *arg)
         do_calibrate = 1;
         cpu_target_calibrate();
         do_calibrate = 0;
-        dbprintf("calibrated OK\n");
+        dbprintf("calibrated OK. %lu loops/sec\n", calibrated_loops_per_sec[0]);
         cpu_target_exit_handler();
 
         cpu_samples = 0;
@@ -171,7 +175,6 @@ int cpu_target_setup(char *arg)
                 exit(1);
         }
 
-        /* Launch the echo server if configured */
         if (strlen(exec_path) > 0) {
                 if (launch_server() != 0) {
                         dbprintf("Failed to launch server\n");
