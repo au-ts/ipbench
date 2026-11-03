@@ -13,8 +13,6 @@ static int num_iperf3_servers = 0;
 static int iperf3_start_port = 5201;
 static char iperf3_server_flags[256] = "";
 static pid_t iperf3_pids[32];
-static int num_samples;
-static int do_calibrate;
 
 /* launch iperf3 servers */
 static int launch_iperf3_servers(void)
@@ -40,7 +38,7 @@ static int launch_iperf3_servers(void)
                 if (iperf3_pids[i] == 0) {
                         int port = iperf3_start_port + i;
 
-                        snprintf(cmd, sizeof(cmd), "iperf3 -s -p %d %s", port,
+                        snprintf(cmd, sizeof(cmd), "exec iperf3 -s -p %d %s", port,
                                  iperf3_server_flags);
 
                         dbprintf("Launching iperf3 server on port %d\n", port);
@@ -87,14 +85,19 @@ static void cleanup_iperf3_servers(void)
 /* Parse iperf3-specific arguments (calls core parser first) */
 static int parse_arg(char *arg)
 {
-        char *c, *cmd, *val;
+        char *c, *cmd, *val, *copy;
         char *arg_ptr = NULL, *cmd_ptr = NULL;
-
-        if (cpu_target_parse_arg(arg))
-                return -1;
 
         if (strlen(arg) == 0)
                 return 0;
+
+        // parsers use strtok_r() which destroys input, take copy
+        copy = strdup(arg);
+        if (copy == NULL || cpu_target_parse_arg(copy)) {
+                free(copy);
+                return -1;
+        }
+        free(copy);
 
         c = strtok_r(arg, ",", &arg_ptr);
         if (c == NULL)
@@ -107,6 +110,8 @@ static int parse_arg(char *arg)
 
                 if (!strcmp(cmd, "fancy_output"))
                         fancy_output = 1;
+                else if (val == NULL)
+                        ;       // skip empty
                 else if (!strcmp(cmd, "num_iperf3_servers"))
                         num_iperf3_servers = strtol(val, (char**)NULL, 10);
                 else if (!strcmp(cmd, "start_port"))
@@ -146,12 +151,8 @@ int iperf3_cpu_target_setup(char *arg)
         if (nr_cpus < 0)
                 return -1;
 
-        if (cooldown_time)
-                num_samples = (2 * ((cooldown_time + 1)));
-        else
-                num_samples = 3600;
-        dbprintf("Averaging (up to) %d samples\n", num_samples);
-        cpu_load = malloc(num_samples * sizeof(double));
+        if (cpu_target_alloc_samples())
+                return -1;
 
         do_calibrate = 1;
         cpu_target_calibrate();
@@ -197,24 +198,18 @@ int iperf3_cpu_target_stop(struct timeval *stop)
 int iperf3_cpu_target_marshall(char **data, int *size, double running_time)
 {
         static char buf[BUFSIZ];
-        char *bp;
+        size_t len;
 
         double av = cpu_target_average_cpu();
 
-        snprintf(buf, BUFSIZ, "%.1f", av*100);
-        bp = buf;
+        len = snprintf(buf, BUFSIZ, "%.1f", av*100);
         dbprintf("Average CPU time is %5.1f%%.\n", av*100);
-        for (int i = 0; i < nr_cpus; i++) {
-                int len;
-                bp = strdup(bp);
-                snprintf(buf, BUFSIZ, ",CPU%d: %.1f", i, cpu_load[i]*100);
-                len = strlen(bp) + strlen(buf) + 1;
-                bp = realloc(bp, len);
-                strncat(bp, buf, len);
-        }
+        for (int i = 0; i < nr_cpus && len < BUFSIZ; i++)
+                len += snprintf(buf + len, BUFSIZ - len, ",CPU%d: %.1f",
+                                i, cpu_target_average_cpu_n(i)*100);
 
-        *data = bp;
-        *size = strlen(bp) + 1;
+        *data = buf;
+        *size = strlen(buf) + 1;
 
         return 0;
 }
@@ -267,4 +262,3 @@ struct ipbench_plugin ipbench_plugin =
         .unmarshall_cleanup = &iperf3_cpu_target_unmarshall_cleanup,
         .output = &iperf3_cpu_target_output,
 };
-

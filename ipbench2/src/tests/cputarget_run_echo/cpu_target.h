@@ -11,10 +11,12 @@
 /* Shared extern declarations from cpu_target.c */
 extern long int        cpu_target_count_cpus(void);
 extern double          cpu_target_average_cpu(void);
+extern double          cpu_target_average_cpu_n(int cpu);
 extern void            cpu_target_calibrate(void);
 extern void            cpu_target_do_cyclesoak(void);
 extern void            cpu_target_exit_handler(void);
 extern int             cpu_target_parse_arg(char *arg);
+extern int             cpu_target_alloc_samples(void);
 
 /* Shared state - defined in cpu_target.c */
 extern int             running;
@@ -28,6 +30,7 @@ extern pid_t           cpu_target_kids[N_CPUS];
 /* Calibration state - these are defined in cpu_target.c */
 extern int             do_calibrate;
 extern unsigned int    calibration_complete;
+extern unsigned long   calibrated_loops_per_sec[N_CPUS];
 
 #endif /* CPU_TARGET_H */
 
