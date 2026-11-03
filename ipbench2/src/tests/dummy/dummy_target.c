@@ -1,4 +1,4 @@
-#include "dummy_target.h" 
+#include "dummy_target.h"
 
 /* a dummy target test */
 
@@ -34,12 +34,10 @@ dummy_target_setup_controller(char *arg)
 int
 dummy_target_start (struct timeval *start)
 {
-	int i=0;
 	dbprintf("DUMMY TARGET START\n");
 	gettimeofday(start, NULL);
 
 	while (running) {
-		i++;
 		usleep(500000);
 	}
 	return 0;

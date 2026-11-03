@@ -53,7 +53,7 @@ static struct latency_result result;
 
 /* Globals and their defaults */
 static int fd;
-static uint64_t samples = SAMPLES;      /* Samples required. A sample is one 
+static uint64_t samples = SAMPLES;      /* Samples required. A sample is one
 					 * packet that has made a round trip
 					 */
 static uint64_t bps=10000000;		/* Throughput to attempt            */
@@ -63,8 +63,8 @@ static uint64_t cooldown=10*US_PER_S;   /* Cooldown for 10 seconds 	    */
 static uint64_t drop_threshold=1;       /* Threshold before dropping a packet with UDP */
 static uint64_t socktype=SOCKTYPE_TCP;  /* By default use TCP               */
 
-static uint64_t *rtt_client_sample;     /* an array of size 'samples' to 
-					 *  hold our results 
+static uint64_t *rtt_client_sample;     /* an array of size 'samples' to
+					 *  hold our results
 					 */
 static uint64_t *rtt_sample;            /* ptr to current sample in
 					 * rtt_client_sample
@@ -136,7 +136,7 @@ static int compare_rtt(const void *x, const void *y)
 
 	if (*rtt_x < *rtt_y) {
 		return -1;
-	} 
+	}
 	if (*rtt_x > *rtt_y) {
 		return 1;
 	}
@@ -231,7 +231,7 @@ measure_latency(int sock, uint64_t bps, uint64_t size,
 	uint64_t now, rtt, send_time;
 	uint64_t late_packets=0;         /* Missing packets */
 	uint64_t dropped_packets=0;      /* Dropped packets */
-	uint64_t bad_packets = 0;        /* packets that haven't been updated */
+	// uint64_t bad_packets = 0;        /* packets that haven't been updated */
 	char *sbuf=NULL, *rbuf=NULL;
 	double send_rate;
 
@@ -284,7 +284,7 @@ measure_latency(int sock, uint64_t bps, uint64_t size,
 			assert(torecv >= 0 && torecv <= size);
 			r = layer->recv_packet(&rbuf[size-torecv], torecv, MSG_WAITALL);
 			if (r < 0) {
-				if (errno != EAGAIN) 
+				if (errno != EAGAIN)
 				{
 					dbprintf("recv error: %s\n", strerror(errno));
 					return -1;
@@ -297,7 +297,9 @@ measure_latency(int sock, uint64_t bps, uint64_t size,
 		} while (torecv > 0);
 
 		if (torecv == 0){
-			bad_packets += layer->read_packet(rbuf, &rid);
+		    // Unused?
+			// bad_packets += layer->read_packet(rbuf, &rid);
+			layer->read_packet(rbuf, &rid);
 			send_time = packet_list_del(rid);
 
 			/* if we are measuring... */
@@ -370,6 +372,7 @@ measure_latency(int sock, uint64_t bps, uint64_t size,
 	result.rtt_max = tick_to_usec(max_rtt(1));
 	result.rtt_med = tick_to_usec(med_rtt(1));
 	result.rtt_std = tick_to_usec(dev_rtt(1));
+#endif
 
 	dbprintf("\n");
 	dbprintf("transferred %"PRId64" bytes in %"PRId64" microseconds\n",
@@ -390,7 +393,6 @@ measure_latency(int sock, uint64_t bps, uint64_t size,
 		 " | RETRYS send %"PRId64" recv %"PRId64"\n",
 		 send_eagains, recv_eagains, broken_sends, broken_recvs);
 
-#endif
 	return 0;
 }
 
@@ -480,9 +482,9 @@ int latency_setup(char *hostname, int port, char *arg)
 		if (parse_arg(arg))
 			return -1;
 
-	/* 
+	/*
 	 * number of packets sent in a second. For testing people want
-	 * to send packets very slowly ... 
+	 * to send packets very slowly ...
 	 */
 	packet_list_length = ((bps / 8) / size);
 	if (packet_list_length < 1)
@@ -774,7 +776,7 @@ int latency_setup_controller(char *arg)
 	return 0;
 }
 
-struct ipbench_plugin ipbench_plugin = 
+struct ipbench_plugin ipbench_plugin =
 {
 	.magic = "IPBENCH_PLUGIN",
 	.name = "latency-check",
@@ -791,4 +793,3 @@ struct ipbench_plugin ipbench_plugin =
 	.unmarshall_cleanup = &latency_unmarshall_cleanup,
 	.output = &latency_output,
 };
-
