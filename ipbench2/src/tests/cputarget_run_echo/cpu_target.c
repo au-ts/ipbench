@@ -26,7 +26,6 @@ extern int do_debug;
 static int              debug;
 
 static struct timeval   alarm_time;
-static unsigned long    calibrated_loops_per_sec[N_CPUS];
 static unsigned long    counts_per_sec[N_CPUS];
 static double           d_counts_per_sec[N_CPUS];
 static char*            busyloop_buf;
@@ -49,8 +48,11 @@ long int                cpu_samples = 0;
 int                     running = 1;
 int                     do_calibrate = 0;
 unsigned int            calibration_complete = 0;
+unsigned long           calibrated_loops_per_sec[N_CPUS];
 
 static int              n_samples;
+/* per-CPU load for each sample: [sample * nr_cpus + cpu] */
+static double          *cpu_load_percpu;
 static long int         warmup_samples = 0;
 
 #define CPS_FILE "counts_per_sec"
@@ -68,7 +70,7 @@ long int cpu_target_count_cpus(void)
                 dbprintf("Failed to count number of processors. Not performing bonding.\n" );
         else {
                 n = strtol(nr_cpus_str, NULL, 10);
-                dbprintf("%d cpus found\n", nr_cpus);
+                dbprintf("%ld cpus found\n", n);
         }
         pclose(fp);
 
@@ -79,21 +81,26 @@ long int cpu_target_count_cpus(void)
         return n;
 }
 
+/* How many of the recorded samples to average. With a cooldown period
+ * the buffer holds twice the cooldown, so only the oldest half is used. */
+static int samples_to_average(void)
+{
+        if (cooldown_time) {
+                if (cpu_samples < n_samples/2) {
+                        dbprintf("Not enough samples to cover cooldown period!\n");
+                        return cpu_samples;
+                }
+                return n_samples/2;
+        }
+        return cpu_samples < n_samples ? cpu_samples : n_samples;
+}
+
+/* Average total load, as a fraction of all CPUs */
 double cpu_target_average_cpu(void)
 {
         double sum = 0;
         int i;
-        int tosum;
-
-        if (cooldown_time) {
-                if ((cpu_samples) < n_samples/2) {
-                        dbprintf("Not enough samples to cover cooldown period!\n");
-                        tosum = cpu_samples;
-                } else
-                        tosum = n_samples/2;
-        }
-        else
-                tosum = cpu_samples;
+        int tosum = samples_to_average();
 
         dbprintf("Averaging %d samples\n", tosum);
 
@@ -101,7 +108,21 @@ double cpu_target_average_cpu(void)
                 sum += cpu_load[i];
         }
 
-        return sum / i;
+        return tosum ? sum / tosum : 0;
+}
+
+/* Average load of a single CPU, over the same samples as above */
+double cpu_target_average_cpu_n(int cpu)
+{
+        double sum = 0;
+        int i;
+        int tosum = samples_to_average();
+
+        for(i = 0; i < tosum; i++) {
+                sum += cpu_load_percpu[i * nr_cpus + cpu];
+        }
+
+        return tosum ? sum / tosum : 0;
 }
 
 static void busyloop(int instance)
@@ -200,6 +221,8 @@ static void itimer(int sig)
                 else
                 {
                         cpu_load[cpu_samples % n_samples] = total_cpu_load;
+                        for (i = 0; i < nr_cpus; i++)
+                                cpu_load_percpu[(cpu_samples % n_samples) * nr_cpus + i] = this_cpu_load[i];
                         cpu_samples++;
                         if (cpu_samples % 5) {
                                 sprintf(print_out, "[%d] System load:%5.1f%%", getpid(), total_cpu_load * 100.0);
@@ -363,3 +386,27 @@ int cpu_target_parse_arg(char *arg)
         return 0;
 }
 
+/* We figure out the number of samples that we would take in the
+ * cooldown period, and then take twice as many samples (n_samples).
+ * This way when we take the average, we throw away the most recent
+ * half and consequently disregard the cooldown period. Without a
+ * cooldown period, take 3600 samples (one hour at one per second).
+ *
+ * Must be called after cpu_target_parse_arg() and once nr_cpus is
+ * known: itimer() indexes cpu_load modulo n_samples, so it must never
+ * be left at zero.
+ */
+int cpu_target_alloc_samples(void)
+{
+        if (cooldown_time)
+                n_samples = (2 * ((cooldown_time + 1) / period_secs));
+        else
+                n_samples = 3600;
+        if (n_samples < 2)
+                n_samples = 2;
+        dbprintf("Averaging (up to) %d samples\n", n_samples);
+        cpu_load = malloc(n_samples * sizeof(double));
+        free(cpu_load_percpu);
+        cpu_load_percpu = malloc(n_samples * nr_cpus * sizeof(double));
+        return (cpu_load == NULL || cpu_load_percpu == NULL) ? -1 : 0;
+}

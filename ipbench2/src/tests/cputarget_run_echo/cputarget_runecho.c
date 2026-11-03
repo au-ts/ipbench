@@ -19,8 +19,6 @@ static int fancy_output = 0;
 static int num_threads = 1;
 static int start_port = 5201;
 static pid_t server_pid = 0;
-static int num_samples;
-static int period_secs = 1;
 static char exec_path[MAX_PATH_LEN] = "";
 static char server_flags[MAX_PATH_LEN] = "";
 
@@ -42,7 +40,10 @@ static int launch_server(void)
         }
 
         if (server_pid == 0) {
-                ret = snprintf(cmd, sizeof(cmd), "%s -p %d -P %d %s",
+                /* The echo servers take positional arguments:
+                 *   <exec_path> <port> <num_threads> [server_flags...]
+                 */
+                ret = snprintf(cmd, sizeof(cmd), "exec %s %d %d %s",
                               exec_path, start_port, num_threads, server_flags);
 
                 if (ret < 0 || (size_t)ret >= sizeof(cmd)) {
@@ -77,9 +78,9 @@ static void cleanup_server(void)
         kill(server_pid, SIGTERM);
 
         usleep(100000);
-        if (kill(server_pid, 0) == 0) {
+        if (waitpid(server_pid, &status, WNOHANG) == 0) {
                 kill(server_pid, SIGKILL);
-                waitpid(server_pid, &status, WNOHANG);
+                waitpid(server_pid, &status, 0);
         }
         server_pid = 0;
 }
@@ -104,6 +105,8 @@ static int parse_echo_args(char *arg)
 
                 if (!strcmp(cmd, "fancy_output"))
                         fancy_output = 1;
+                else if (val == NULL)
+                        ;       // skip empty
                 else if (!strcmp(cmd, "num_threads"))
                         num_threads = strtol(val, (char**)NULL, 10);
                 else if (!strcmp(cmd, "start_port"))
@@ -140,14 +143,20 @@ int cpu_target_setup(char *arg)
         dbprintf("Setup test.\n");
 
         if (strlen(arg) != 0) {
-                /* Parse CPU target args (warmup, cooldown, cpus, etc) */
-                if (cpu_target_parse_arg(arg))
+                // parsers use strtok_r() which destroys input, take copy
+                char *arg_copy = strdup(arg);
+                if (arg_copy == NULL)
                         return -1;
 
-                /* Parse echo server specific args (need fresh copy - make a temp copy for parsing) */
-                char *arg_copy = strdup(arg);
-                if (parse_echo_args(arg_copy))
+                if (cpu_target_parse_arg(arg)) {
+                        free(arg_copy);
                         return -1;
+                }
+
+                if (parse_echo_args(arg_copy)) {
+                        free(arg_copy);
+                        return -1;
+                }
                 free(arg_copy);
         }
 
@@ -155,13 +164,8 @@ int cpu_target_setup(char *arg)
         if (nr_cpus < 0)
                 return -1;
 
-        /* Match original calculation: (2 * ((cooldown_time + 1) / period_secs)) */
-        if (cooldown_time)
-                num_samples = (2 * ((cooldown_time + 1) / period_secs));
-        else
-                num_samples = 3600;
-        dbprintf("Averaging (up to) %d samples\n", num_samples);
-        cpu_load = malloc(num_samples * sizeof(double));
+        if (cpu_target_alloc_samples())
+                return -1;
 
         do_calibrate = 1;
         cpu_target_calibrate();
@@ -207,24 +211,18 @@ int cpu_target_stop(struct timeval *stop)
 int cpu_target_marshall(char **data, int *size, double running_time)
 {
         static char buf[BUFSIZ];
-        char *bp;
+        size_t len;
 
         double av = cpu_target_average_cpu();
 
-        snprintf(buf, BUFSIZ, "%.1f", av*100);
-        bp = buf;
+        len = snprintf(buf, BUFSIZ, "%.1f", av*100);
         dbprintf("Average CPU time is %5.1f%%.\n", av*100);
-        for (int i = 0; i < nr_cpus; i++) {
-                int len;
-                bp = strdup(bp);
-                snprintf(buf, BUFSIZ, ",CPU%d: %.1f", i, cpu_load[i]*100);
-                len = strlen(bp) + strlen(buf) + 1;
-                bp = realloc(bp, len);
-                strncat(bp, buf, len);
-        }
+        for (int i = 0; i < nr_cpus && len < BUFSIZ; i++)
+                len += snprintf(buf + len, BUFSIZ - len, ",CPU%d: %.1f",
+                                i, cpu_target_average_cpu_n(i)*100);
 
-        *data = bp;
-        *size = strlen(bp) + 1;
+        *data = buf;
+        *size = strlen(buf) + 1;
 
         return 0;
 }
@@ -277,4 +275,3 @@ struct ipbench_plugin ipbench_plugin =
         .unmarshall_cleanup = &cpu_target_unmarshall_cleanup,
         .output = &cpu_target_output,
 };
-
